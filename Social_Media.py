@@ -22,17 +22,36 @@ def init_db():
         DROP TABLE IF EXISTS chat_rel;
         DROP TABLE IF EXISTS chat;
         DROP TABLE IF EXISTS message;
+        CREATE TABLE login(
+            id INTEGER PRIMARY KEY,
+            user_name TEXT UNIQUE,
+            password TEXT
+        );
         CREATE TABLE user (
             id INTEGER PRIMARY KEY,
-            first TEXT,
-            last TEXT           
+            name TEXT,
+            login_id INTEGER,
+            FOREIGN KEY(login_id) REFERENCES login(id)           
+        );
+        CREATE TABLE chat_rel(
+            id INTEGER PRIMARY KEY,
+            user_id INTEGER,
+            chat_id INTEGER UNIQUE,
+            FOREIGN KEY(user_id) REFERENCES user(id)
+        );
+        CREATE TABLE chat(
+            message_id INTEGER PRIMARY KEY,
+            time TEXT,
+            id INTEGER,
+            FOREIGN KEY(id) REFERENCES chat_rel(chat_id)
         );
         CREATE TABLE message (
-            id INTEGER PRIMARY KEY,
             message TEXT,
             time TEXT,
             user_id INTEGER,
-            FOREIGN KEY(user_id) REFERENCES user(id)
+            id INTEGER,
+            FOREIGN KEY(user_id) REFERENCES user(id),
+            FOREIGN KEY(id) REFERENCES chat(id)
         );                    
     '''
 
