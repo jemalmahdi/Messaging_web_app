@@ -17,16 +17,19 @@ def init_db():
     conn = get_db()
 
     query = '''
+        DROP TABLE IF EXISTS login;
         DROP TABLE IF EXISTS user;
-        DROP TABLE IF EXISTS post;
+        DROP TABLE IF EXISTS chat_rel;
+        DROP TABLE IF EXISTS chat;
+        DROP TABLE IF EXISTS message;
         CREATE TABLE user (
             id INTEGER PRIMARY KEY,
             first TEXT,
             last TEXT           
         );
-        CREATE TABLE post (
+        CREATE TABLE message (
             id INTEGER PRIMARY KEY,
-            post TEXT,
+            message TEXT,
             time TEXT,
             user_id INTEGER,
             FOREIGN KEY(user_id) REFERENCES user(id)
@@ -118,34 +121,34 @@ def get_all_rows(table_name):
 
     return results
 
-def insert_post(post, user_id):
+def insert_message(message, user_id):
     conn = get_db()
     cur = conn.cursor()
 
     query = '''
-        INSERT INTO post(post, time, user_id) VALUES(?, ?, ?)
+        INSERT INTO message(message, time, user_id) VALUES(?, ?, ?)
     '''
 
-    cur.execute(query, (post, get_date(), user_id))
+    cur.execute(query, (message, get_date(), user_id))
     conn.commit()
 
-    cur.execute('SELECT * FROM post WHERE id = ?', (cur.lastrowid,))
+    cur.execute('SELECT * FROM message WHERE id = ?', (cur.lastrowid,))
 
     return dict(cur.fetchone())
 
 
-def update_post(text, user_id, post_id):
+def update_message(text, user_id, message_id):
     conn = get_db()
     cur = conn.cursor()
 
     query = '''
-        UPDATE post SET text = ? AND user_id = ? WHERE id = ?
+        UPDATE message SET text = ? AND user_id = ? WHERE id = ?
     '''
 
-    cur.execute(query, (text, user_id, post_id))
+    cur.execute(query, (text, user_id, message_id))
     conn.commit()
 
-    cur.execute('SELECT * FROM post WHERE id = ?', (post_id,))
+    cur.execute('SELECT * FROM message WHERE id = ?', (message_id,))
 
     return dict(cur.fetchone())
 
@@ -169,130 +172,130 @@ def delete_item(table_name, item_id):
     return None
 
 
-class PostView(MethodView):
-    def get(self, post_id):
+class MessageView(MethodView):
+    def get(self, message_id):
         """
         Handle GET requests.
 
-        Returns JSON representing all of the post if post_id is None, or a
-        single post if post_id is not None.
+        Returns JSON representing all of the message if message_id is None, or a
+        single message if message_id is not None.
 
-        :param post_id: id of a post, or None for all posts
+        :param message_id: id of a message, or None for all messages
         :return: JSON response
         """
-        if post_id is None:
-            posts = get_all_rows('post')
-            return jsonify(posts)
+        if message_id is None:
+            messages = get_all_rows('message')
+            return jsonify(messages)
         else:
-            posts = query_by_id('post', post_id)
+            messages = query_by_id('message', message_id)
 
-            if posts is not None:
-                response = jsonify(posts)
+            if messages is not None:
+                response = jsonify(messages)
             else:
-                raise RequestError(404, 'post not found')
+                raise RequestError(404, 'message not found')
 
             return response
 
     def post(self, user_id):
         """
-        Handles a post request to insert a new city. Returns a JSON
-        response representing the new post.
+        Handles a message request to insert a new city. Returns a JSON
+        response representing the new message.
 
-        The post name must be provided in the requests's form data.
+        The message name must be provided in the requests's form data.
 
-        :return: a response containing the JSON representation of the post
+        :return: a response containing the JSON representation of the message
         """
         if 'text' not in request.form:
-            raise RequestError(422, 'text of post required')
+            raise RequestError(422, 'text of message required')
         else:
-            response = jsonify(insert_post(request.form['text'], user_id))
+            response = jsonify(insert_message(request.form['text'], user_id))
         return response
 
-    def delete(self, post_id):
+    def delete(self, message_id):
         """
-        Handles a DELETE request given a certain post_id
+        Handles a DELETE request given a certain message_id
         :return: a response containing the JSON representation of the
-            old post
+            old message
         """
 
-        if post_id is None:
-            raise RequestError(422, 'post id required')
+        if message_id is None:
+            raise RequestError(422, 'message id required')
         else:
-            posts = query_by_id('post', post_id)
+            messages = query_by_id('message', message_id)
 
-            if posts is not None:
-                delete_item('post', post_id)
+            if messages is not None:
+                delete_item('message', message_id)
             else:
-                raise RequestError(404, 'post not found')
-        return jsonify(posts)
+                raise RequestError(404, 'message not found')
+        return jsonify(messages)
 
-    def put(self, post_id):
+    def put(self, message_id):
         """
-        Handles a PUT request given a certain post_id
+        Handles a PUT request given a certain message_id
         :return:a response containing the JSON representation of the
-            new post
+            new message
         """
 
-        if post_id is None:
-            raise RequestError(422, 'post id is required')
+        if message_id is None:
+            raise RequestError(422, 'message id is required')
         else:
             if 'text' not in request.form:
-                raise RequestError(422, 'post text is required')
+                raise RequestError(422, 'message text is required')
             else:
-                post = query_by_id('post', post_id)
+                message = query_by_id('message', message_id)
 
-                if post is not None:
-                    update_post(request.form['text'],
-                                  request.form['user'], post_id)
+                if message is not None:
+                    update_message(request.form['text'],
+                                  request.form['user'], message_id)
                 else:
-                    raise RequestError(404, 'post not found')
+                    raise RequestError(404, 'message not found')
 
-                post = query_by_id('post', post_id)
-                return jsonify(post)
+                message = query_by_id('message', message_id)
+                return jsonify(message)
 
-    def patch(self, post_id):
+    def patch(self, message_id):
         """
-        Handles the PATCH request given a certain post_id
+        Handles the PATCH request given a certain message_id
         :return:a response containing the JSON representation of the
-            old post
+            old message
         """
 
-        if post_id is None:
-            raise RequestError(422, 'post id is required')
+        if message_id is None:
+            raise RequestError(422, 'message id is required')
         else:
-            posts = query_by_id('post', post_id)
+            messages = query_by_id('message', message_id)
 
-            if posts is None:
-                raise RequestError(404, 'post not found')
+            if messages is None:
+                raise RequestError(404, 'message not found')
             else:
 
-                new_text = posts['text']
+                new_text = messages['text']
                 if 'text' in request.form:
                     new_name = request.form['text']
 
-                new_user = posts['user_id']
+                new_user = messages['user_id']
                 if 'user' in request.form:
                     new_user = request.form['user']
 
-                update_post(post_id, new_text, new_user)
-                posts = query_by_id('posts', post_id)
-                return jsonify(posts)
+                update_message(message_id, new_text, new_user)
+                messages = query_by_id('messages', message_id)
+                return jsonify(messages)
 
 
 
-# Register PostView as the handler for all the /post/ requests. For
+# Register MessageView as the handler for all the /message/ requests. For
 # more info
 # about what is going on here, see http://flask.pocoo.org/docs/0.12/views/
-post_view = PostView.as_view('post_view')
-app.add_url_rule('/post/', defaults={'post_id': None},
-                 view_func=post_view, methods=['GET'])
-app.add_url_rule('/post/<int:user_id>', view_func=post_view,
-                 methods=['POST'])
-app.add_url_rule('/post/<int:post_id>', view_func=post_view,
+message_view = MessageView.as_view('message_view')
+app.add_url_rule('/message/', defaults={'message_id': None},
+                 view_func=message_view, methods=['GET'])
+app.add_url_rule('/message/<int:user_id>', view_func=message_view,
+                 methods=['message'])
+app.add_url_rule('/message/<int:message_id>', view_func=message_view,
                  methods=['GET'])
-app.add_url_rule('/post/<int:post_id>', view_func=post_view,
+app.add_url_rule('/message/<int:message_id>', view_func=message_view,
                  methods=['DELETE'])
-app.add_url_rule('/post/<int:post_id>', view_func=post_view,
+app.add_url_rule('/message/<int:message_id>', view_func=message_view,
                  methods=['PUT'])
-app.add_url_rule('/post/<int:post_id>', view_func=post_view,
+app.add_url_rule('/message/<int:message_id>', view_func=message_view,
                  methods=['PATCH'])
