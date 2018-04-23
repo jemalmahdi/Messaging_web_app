@@ -214,6 +214,10 @@ class RequestError(Exception):
 def handle_invalid_usage(error):
     """
     Returns a JSON response built from RequestError.
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3fdf6354af63512dcf2e944a7f11c5422af619b3
     :param error: the RequestError
     :return: a response containing the error message
     """
@@ -361,4 +365,4 @@ app.add_url_rule('/message/<int:message_id>', view_func=message_view,
 app.add_url_rule('/message/<int:message_id>', view_func=message_view,
                  methods=['PUT'])
 app.add_url_rule('/message/<int:message_id>', view_func=message_view,
-methods=['PATCH'])
+                 methods=['PATCH'])
