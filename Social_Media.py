@@ -10,6 +10,7 @@ app = Flask(__name__)
 
 app.config['DATABASE'] = os.path.join(app.root_path, 'Social.sqlite')
 
+
 def init_db():
     """
     This will initialize the database
@@ -89,6 +90,9 @@ def get_db():
 
 
 def get_date():
+    """
+    Returns the current date and time in yyyy/mm/dd  h/m format
+    """
     now = datetime.datetime.now()
 
     return now.strftime("%Y-%m-%d %H:%M")
@@ -97,9 +101,7 @@ def get_date():
 def query_by_id(table_name, item_id):
     """
     Get a row from a table that has a primary key attribute named id.
-
     Returns None of there is no such row.
-
     :param table_name: name of the table to query
     :param item_id: id of the row
     :return: a dictionary representing the row
@@ -123,7 +125,6 @@ def get_all_rows(table_name):
     """
     Returns all of the rows from a table as a list of dictionaries. This is
     suitable for passing to jsonify().
-
     :param table_name: name of the table
     :return: list of dictionaries representing the table's rows
     """
@@ -139,6 +140,7 @@ def get_all_rows(table_name):
         results.append(dict(row))
 
     return results
+
 
 def insert_message(message, user_id):
     conn = get_db()
@@ -175,7 +177,6 @@ def update_message(text, user_id, message_id):
 def delete_item(table_name, item_id):
     """
     This function deletes items with item_id from table_name
-
     :param table_name: the table which has an item to delete
     :param item_id: it item which to delte
     :return: NONE
@@ -189,6 +190,38 @@ def delete_item(table_name, item_id):
     conn.commit()
 
     return None
+
+
+# START: Taken from homework 18
+class RequestError(Exception):
+    """
+    Custom exception class for handling errors in a request.
+    """
+
+    def __init__(self, status_code, error_message):
+        Exception.__init__(self)
+
+        self.status_code = str(status_code)
+        self.error_message = str(error_message)
+
+    def to_response(self):
+        response = jsonify({'error': self.error_message})
+        response.status = self.status_code
+        return response
+
+
+@app.errorhandler(RequestError)
+def handle_invalid_usage(error):
+    """
+    Returns a JSON response built from RequestError.
+    :param error: the RequestError
+    :return: a response containing the error message
+    """
+    return error.to_response()
+
+
+# END: Taken from homework 18
+
 
 @app.route('/')
 def home_page():
@@ -211,10 +244,8 @@ class MessageView(MethodView):
     def get(self, message_id):
         """
         Handle GET requests.
-
         Returns JSON representing all of the message if message_id is None, or a
         single message if message_id is not None.
-
         :param message_id: id of a message, or None for all messages
         :return: JSON response
         """
@@ -235,9 +266,7 @@ class MessageView(MethodView):
         """
         Handles a message request to insert a new city. Returns a JSON
         response representing the new message.
-
         The message name must be provided in the requests's form data.
-
         :return: a response containing the JSON representation of the message
         """
         if 'text' not in request.form:
@@ -317,7 +346,6 @@ class MessageView(MethodView):
                 return jsonify(messages)
 
 
-
 # Register MessageView as the handler for all the /message/ requests. For
 # more info
 # about what is going on here, see http://flask.pocoo.org/docs/0.12/views/
@@ -333,4 +361,4 @@ app.add_url_rule('/message/<int:message_id>', view_func=message_view,
 app.add_url_rule('/message/<int:message_id>', view_func=message_view,
                  methods=['PUT'])
 app.add_url_rule('/message/<int:message_id>', view_func=message_view,
-                 methods=['PATCH'])
+methods=['PATCH'])
