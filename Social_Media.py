@@ -197,6 +197,16 @@ def home_page():
     """
     return render_template('HomePage.html')
 
+
+@app.route('/login')
+def login():
+    """
+    Serves as a login page
+    """
+
+    return render_template('Login.html')
+
+
 class MessageView(MethodView):
     def get(self, message_id):
         """
