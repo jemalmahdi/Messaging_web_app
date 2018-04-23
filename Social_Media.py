@@ -143,6 +143,15 @@ def get_all_rows(table_name):
 
 
 def insert_message(message, user_id):
+    """
+    Will insert a new message into the message database. it will indicate which
+    user had sent the message, as indicated by the user_id.
+
+    :param message: the message to be added into the database
+    :param user_id: the id of the user sending the message
+    :return: a list of dictionaries representing the message recently sent
+    """
+
     conn = get_db()
     cur = conn.cursor()
 
@@ -157,8 +166,41 @@ def insert_message(message, user_id):
 
     return dict(cur.fetchone())
 
+def insert_user(name, login_id):
+    """
+    Will insert a new user into the database. This is given by a new login_id.
 
-def update_message(text, user_id, message_id):
+    :param name: the username of the new user
+    :param login_id: the login_id of the user
+    :return: a list of dictionaries representing the new user.
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    query = '''
+        INSERT INTO user(name, login_id) VLAUES(?, ?)
+    '''
+
+    cur .execute(query, (name, login_id))
+    conn.commit()
+
+    cur.execute('SELECT * FROM user WHERE id = ?', (cur.lastrowid,))
+
+    return dict(cur.fetchone())
+
+
+def update_message(message, user_id, message_id):
+    """
+    will update a message that was sent and needs to be fixed, as indicated by
+    a specific user
+
+    :param message: the message which is updated
+    :param user_id: the user who is changing the message
+    :param message_id: the id of the message to be changed
+    :return: a dictionary representing the new message
+    """
+
     conn = get_db()
     cur = conn.cursor()
 
@@ -166,13 +208,36 @@ def update_message(text, user_id, message_id):
         UPDATE message SET text = ? AND user_id = ? WHERE id = ?
     '''
 
-    cur.execute(query, (text, user_id, message_id))
+    cur.execute(query, (message, user_id, message_id))
     conn.commit()
 
     cur.execute('SELECT * FROM message WHERE id = ?', (message_id,))
 
     return dict(cur.fetchone())
 
+
+def update_user(user_id, name):
+    """
+    Wil update a username given a specific user_id
+
+    :param user_id: the id of the user to be updated
+    :param name: the updated username
+    :return: a dictionary representing the new, updated user
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    query = '''
+        UPDATE user SET name = ? WHERE id = ?
+    '''
+
+    cur.execute(query, (name, user_id))
+    conn.commit()
+
+    cur.execute('SELECT * FROM user WHERE id = ?', (user_id,))
+
+    return dict(cur.fetchone())
 
 def delete_item(table_name, item_id):
     """
@@ -387,7 +452,8 @@ class UserView(MethodView):
         if 'name' not in request.form:
             raise RequestError(422, 'user name required')
         else:
-            response = jsonify(insert_user(request.form['name']))
+            response = jsonify(insert_user(request.form['name'], login_id))
+            #Need to get login_id
 
         return response
 
