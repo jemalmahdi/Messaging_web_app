@@ -347,6 +347,119 @@ class MessageView(MethodView):
                 return jsonify(messages)
 
 
+class UserView(MethodView):
+    """
+    This view handles all the /user/ requests.
+    """
+
+    def get(self, user_id):
+        """
+        Handle GET requests.
+
+        Returns JSON representing all of the users if user_id is None, or a
+        single user if user_id is not None.
+
+        :param user_id: id of a user, or None for all users
+        :return: JSON response
+        """
+        if user_id is None:
+            user = get_all_rows('user')
+            return jsonify(user)
+        else:
+            user = query_by_id('user', user_id)
+
+            if user is not None:
+                response = jsonify(user)
+            else:
+                raise RequestError(404, 'user not found')
+
+            return response
+
+    def post(self):
+        """
+        Handles a POST request to insert a new user. Returns a JSON
+        response representing the new user.
+
+        The user name must be provided in the requests's form data.
+
+        :return: a response containing the JSON representation of the user
+        """
+        if 'name' not in request.form:
+            raise RequestError(422, 'user name required')
+        else:
+            response = jsonify(insert_user(request.form['name']))
+
+        return response
+
+    def delete(self, user_id):
+        """
+        Handles a DELETE request given a certain user_id
+
+        :param user_id: the id of the user to delete
+        :return: a response containing the JSON representation of the
+            old user
+        """
+
+        if user_id is None:
+            raise RequestError(422, 'user name required')
+        else:
+            user = query_by_id('user', user_id)
+
+            if user is not None:
+                delete_item('user', user_id)
+            else:
+                raise RequestError(404, 'user not found')
+        return jsonify(user)
+
+    def put(self, user_id):
+        """
+        Handles a PUT request given a certain user_id
+        :return:a response containing the JSON representation of the
+            new user
+        """
+
+        if user_id is None:
+            raise RequestError(422, 'User Id is required')
+        else:
+            if 'name' not in request.form:
+                raise RequestError(422, 'User name is required')
+            else:
+                user = query_by_id('user', user_id)
+
+                if user is not None:
+                    update_user(user_id, request.form['name'])
+                else:
+                    raise RequestError(404, 'user not found')
+                user = query_by_id('user', user_id)
+                return jsonify(user)
+
+    def patch(self, user_id):
+        """
+        Handles the PATCH request given a certain user_id
+
+        :param user_id: the id of the user to be patched
+        :return:a response containing the JSON representation of the
+            old user
+        """
+
+        if user_id is None:
+            raise RequestError(422, 'User Id is required')
+        else:
+            user = query_by_id('user', user_id)
+
+            if user is None:
+                raise RequestError(404, 'User not found')
+            else:
+
+                new_name = user['name']
+                if 'name' in request.form:
+                    new_name = request.form['name']
+
+                update_user(user_id, new_name)
+                user = query_by_id('user', user_id)
+                return jsonify(user)
+
+
 class ChatView(MethodView):
     def get(self, chat_id):
         """
@@ -424,13 +537,29 @@ app.add_url_rule('/message/<int:message_id>', view_func=message_view,
                  methods=['PATCH'])
 
 
+# Register UserView as the handler for all the /user/ requests.
+user_view = UserView.as_view('user_view')
+app.add_url_rule('/user/', defaults={'user_id': None},
+                 view_func=user_view, methods=['GET'])
+app.add_url_rule('/user/', view_func=user_view,
+                 methods=['POST']) #Hey, should this be message? or POST
+app.add_url_rule('/user/<int:user_id>', view_func=user_view,
+                 methods=['GET'])
+app.add_url_rule('/user/<int:uer_id>', view_func=user_view,
+                 methods=['DELETE'])
+app.add_url_rule('/user/<int:user_id>', view_func=user_view,
+                 methods=['PUT'])
+app.add_url_rule('/user/<int:user_id>', view_func=user_view,
+                 methods=['PATCH'])
+
+
 #Register ChatView as the handler for all the /chat/ requests.
 chat_view = ChatView.as_view('chat_view')
 app.add_url_rule('/chat/', defaults={'chat_id': None},
                  view_func=chat_view, methods=['GET'])
-app.add_url_rule('/chat/<int:user_id>', view_func=message_view,
+app.add_url_rule('/chat/<int:user_id>', view_func=chat_view,
                  methods=['POST'])
-app.add_url_rule('/chat/<int:user_id>', view_func=message_view,
+app.add_url_rule('/chat/<int:user_id>', view_func=chat_view,
                  methods=['GET'])
-app.add_url_rule('/chat/<int:chat_id>', view_func=message_view,
+app.add_url_rule('/chat/<int:chat_id>', view_func=chat_view,
                  methods=['DELETE'])
