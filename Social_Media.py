@@ -214,10 +214,7 @@ class RequestError(Exception):
 def handle_invalid_usage(error):
     """
     Returns a JSON response built from RequestError.
-<<<<<<< HEAD
-=======
 
->>>>>>> 3fdf6354af63512dcf2e944a7f11c5422af619b3
     :param error: the RequestError
     :return: a response containing the error message
     """
@@ -350,6 +347,65 @@ class MessageView(MethodView):
                 return jsonify(messages)
 
 
+class ChatView(MethodView):
+    def get(self, chat_id):
+        """
+        Handle GET requests.
+        Returns JSON representing all of the message if chat_id is None, or a
+        single chat if chat_id is not None.
+        :param chat_id: id of a chat, or None for all chats
+        :return: JSON response
+        """
+        if chat_id is None:
+            chat = get_all_rows('chat')
+            return jsonify(chat)
+        else:
+            chat = query_by_id('chat', chat_id)
+
+            if chat is not None:
+                response = jsonify(chat)
+            else:
+                raise RequestError(404, 'chat not found')
+
+            return response
+
+    def post(self, user_id):
+        """
+        Handles a message request to insert a new chat. Returns a JSON
+        response representing the new chat.
+        The must be provided in the requests's form data.
+
+        :param user_id: the id of the user creating the chat.
+        :return: a response containing the JSON representation of the message
+        """
+        if 'user_id' is None:
+            raise RequestError(422, 'user id required')
+        else:
+            #FIND SOMETHING THAT WORKS HERE
+            response = jsonify(insert_message(request.form['text'], user_id))
+        return response
+
+    def delete(self, chat_id):
+        """
+        Handles a DELETE request given a certain chat_id
+
+        :param chat_id: the id of the chat to be deleted
+        :return: a response containing the JSON representation of the
+            old message
+        """
+
+        if chat_id is None:
+            raise RequestError(422, 'chat id required')
+        else:
+            chat = query_by_id('chat', chat_id)
+
+            if chat is not None:
+                delete_item('chat', chat_id)
+            else:
+                raise RequestError(404, 'chat not found')
+        return jsonify(chat)
+
+
 # Register MessageView as the handler for all the /message/ requests. For
 # more info
 # about what is going on here, see http://flask.pocoo.org/docs/0.12/views/
@@ -357,7 +413,7 @@ message_view = MessageView.as_view('message_view')
 app.add_url_rule('/message/', defaults={'message_id': None},
                  view_func=message_view, methods=['GET'])
 app.add_url_rule('/message/<int:user_id>', view_func=message_view,
-                 methods=['message'])
+                 methods=['message']) #Hey, should this be message? or POST
 app.add_url_rule('/message/<int:message_id>', view_func=message_view,
                  methods=['GET'])
 app.add_url_rule('/message/<int:message_id>', view_func=message_view,
@@ -366,3 +422,15 @@ app.add_url_rule('/message/<int:message_id>', view_func=message_view,
                  methods=['PUT'])
 app.add_url_rule('/message/<int:message_id>', view_func=message_view,
                  methods=['PATCH'])
+
+
+#Register ChatView as the handler for all the /chat/ requests.
+chat_view = ChatView.as_view('chat_view')
+app.add_url_rule('/chat/', defaults={'chat_id': None},
+                 view_func=chat_view, methods=['GET'])
+app.add_url_rule('/chat/<int:user_id>', view_func=message_view,
+                 methods=['POST'])
+app.add_url_rule('/chat/<int:user_id>', view_func=message_view,
+                 methods=['GET'])
+app.add_url_rule('/chat/<int:chat_id>', view_func=message_view,
+                 methods=['DELETE'])
