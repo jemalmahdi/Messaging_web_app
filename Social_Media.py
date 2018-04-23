@@ -190,6 +190,12 @@ def delete_item(table_name, item_id):
 
     return None
 
+@app.route('/')
+def home_page():
+    """
+    Serves as a home page
+    """
+    return render_template('HomePage.html')
 
 class MessageView(MethodView):
     def get(self, message_id):
