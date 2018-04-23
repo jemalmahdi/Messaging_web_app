@@ -89,6 +89,9 @@ def get_db():
 
 
 def get_date():
+    """
+    Returns the current date and time in yyyy/mm/dd  h/m format
+    """
     now = datetime.datetime.now()
 
     return now.strftime("%Y-%m-%d %H:%M")
