@@ -401,7 +401,7 @@ class MessageView(MethodView):
 
                 new_text = messages['text']
                 if 'text' in request.form:
-                    new_name = request.form['text']
+                    new_text = request.form['text']
 
                 new_user = messages['user_id']
                 if 'user' in request.form:
