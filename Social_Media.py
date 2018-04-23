@@ -352,7 +352,6 @@ class MessageView(MethodView):
                 return jsonify(messages)
 
 
-
 # Register MessageView as the handler for all the /message/ requests. For
 # more info
 # about what is going on here, see http://flask.pocoo.org/docs/0.12/views/
