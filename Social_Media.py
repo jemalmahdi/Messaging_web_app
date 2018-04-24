@@ -585,7 +585,7 @@ class ChatView(MethodView):
 
             return response
 
-    def post(self, user_id):
+    def post(self):
         """
         Handles a message request to insert a new chat. Returns a JSON
         response representing the new chat.
@@ -594,7 +594,7 @@ class ChatView(MethodView):
         :param user_id: the id of the user creating the chat.
         :return: a response containing the JSON representation of the message
         """
-        if 'user_id' is None:
+        if 'user_id' not in request.form:
             raise RequestError(422, 'user id required')
         else:
             #FIND SOMETHING THAT WORKS HERE
@@ -633,7 +633,7 @@ app.add_url_rule('/message/', view_func=message_view,
 # For this you would need to provide the user_id through the form data. URL
 # values are only for message ID -Morgan
 # app.add_url_rule('/message/<int:user_id>', view_func=message_view,
-#                methods=['POST'])  # Hey, should this be message? or POST
+#                  methods=['POST'])  # Hey, should this be message? or POST
 app.add_url_rule('/message/<int:message_id>', view_func=message_view,
                  methods=['GET'])
 app.add_url_rule('/message/<int:message_id>', view_func=message_view,
@@ -649,7 +649,7 @@ user_view = UserView.as_view('user_view')
 app.add_url_rule('/user/', defaults={'user_id': None},
                  view_func=user_view, methods=['GET'])
 app.add_url_rule('/user/', view_func=user_view,
-                 methods=['POST']) # Hey, should this be message? or POST
+                 methods=['POST'])  # Hey, should this be message? or POST
 app.add_url_rule('/user/<int:user_id>', view_func=user_view,
                  methods=['GET'])
 app.add_url_rule('/user/<int:uer_id>', view_func=user_view,
@@ -664,8 +664,11 @@ app.add_url_rule('/user/<int:user_id>', view_func=user_view,
 chat_view = ChatView.as_view('chat_view')
 app.add_url_rule('/chat/', defaults={'chat_id': None},
                  view_func=chat_view, methods=['GET'])
-app.add_url_rule('/chat/<int:user_id>', view_func=chat_view,
+app.add_url_rule('/chat/', view_func=chat_view,
                  methods=['POST'])
+# Same issue as line 635
+# app.add_url_rule('/chat/<int:user_id>', view_func=chat_view,
+#                  methods=['POST'])
 app.add_url_rule('/chat/<int:user_id>', view_func=chat_view,
                  methods=['GET'])
 app.add_url_rule('/chat/<int:chat_id>', view_func=chat_view,
