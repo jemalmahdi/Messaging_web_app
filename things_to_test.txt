@@ -1,0 +1,18 @@
+THINGS TO TEST -*- mode: org -*-
+^ DO NOT REMOVE THAT ^
+
+* REST API
+** MESSAGE
+- [ ] POST Message
+  - provide message
+  - provide user_id
+- [ ] GET Message
+  - [ ] GET one
+  - [ ] GET all
+- [ ] PUT Message
+  - provide message
+  - provide user_id
+- [ ] PATCH Message
+  - [ ] PATCH message data
+  - [ ] PATCH user_id data
+- [ ] DELETE Message
