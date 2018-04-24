@@ -338,6 +338,15 @@ def login():
     return render_template('Login.html')
 
 
+@app.route('/new_user')
+def new_user():
+    """
+    Serves as a page to register a new account
+    """
+
+    return render_template('New_User.html')
+
+
 class LoginView(MethodView):
     """
     This view handles all the /login/ requests.
