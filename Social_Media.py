@@ -360,7 +360,9 @@ class MessageView(MethodView):
 
             return response
 
-    def post(self, user_id):
+    # The user_id should be provided through form data, not URL data. I
+    # updated it to fix that -Morgan
+    def post(self):
         """
         Handles a message request to insert a new city. Returns a JSON
         response representing the new message.
@@ -369,8 +371,11 @@ class MessageView(MethodView):
         """
         if 'text' not in request.form:
             raise RequestError(422, 'text of message required')
+        elif 'user_id' not in request.form:
+            raise RequestError(422, 'user id required')
         else:
-            response = jsonify(insert_message(request.form['text'], user_id))
+            response = jsonify(insert_message(request.form['text'],
+                                              request.form['user_id']))
         return response
 
     def delete(self, message_id):
@@ -580,7 +585,7 @@ class ChatView(MethodView):
 
             return response
 
-    def post(self, user_id):
+    def post(self):
         """
         Handles a message request to insert a new chat. Returns a JSON
         response representing the new chat.
@@ -589,7 +594,7 @@ class ChatView(MethodView):
         :param user_id: the id of the user creating the chat.
         :return: a response containing the JSON representation of the message
         """
-        if 'user_id' is None:
+        if 'user_id' not in request.form:
             raise RequestError(422, 'user id required')
         else:
             #FIND SOMETHING THAT WORKS HERE
@@ -623,8 +628,12 @@ class ChatView(MethodView):
 message_view = MessageView.as_view('message_view')
 app.add_url_rule('/message/', defaults={'message_id': None},
                  view_func=message_view, methods=['GET'])
-app.add_url_rule('/message/<int:user_id>', view_func=message_view,
-                 methods=['message']) #Hey, should this be message? or POST
+app.add_url_rule('/message/', view_func=message_view,
+                 methods=['POST'])
+# For this you would need to provide the user_id through the form data. URL
+# values are only for message ID -Morgan
+# app.add_url_rule('/message/<int:user_id>', view_func=message_view,
+#                  methods=['POST'])  # Hey, should this be message? or POST
 app.add_url_rule('/message/<int:message_id>', view_func=message_view,
                  methods=['GET'])
 app.add_url_rule('/message/<int:message_id>', view_func=message_view,
@@ -640,7 +649,7 @@ user_view = UserView.as_view('user_view')
 app.add_url_rule('/user/', defaults={'user_id': None},
                  view_func=user_view, methods=['GET'])
 app.add_url_rule('/user/', view_func=user_view,
-                 methods=['POST']) #Hey, should this be message? or POST
+                 methods=['POST'])  # Hey, should this be message? or POST
 app.add_url_rule('/user/<int:user_id>', view_func=user_view,
                  methods=['GET'])
 app.add_url_rule('/user/<int:uer_id>', view_func=user_view,
@@ -651,12 +660,15 @@ app.add_url_rule('/user/<int:user_id>', view_func=user_view,
                  methods=['PATCH'])
 
 
-#Register ChatView as the handler for all the /chat/ requests.
+# Register ChatView as the handler for all the /chat/ requests.
 chat_view = ChatView.as_view('chat_view')
 app.add_url_rule('/chat/', defaults={'chat_id': None},
                  view_func=chat_view, methods=['GET'])
-app.add_url_rule('/chat/<int:user_id>', view_func=chat_view,
+app.add_url_rule('/chat/', view_func=chat_view,
                  methods=['POST'])
+# Same issue as line 635
+# app.add_url_rule('/chat/<int:user_id>', view_func=chat_view,
+#                  methods=['POST'])
 app.add_url_rule('/chat/<int:user_id>', view_func=chat_view,
                  methods=['GET'])
 app.add_url_rule('/chat/<int:chat_id>', view_func=chat_view,
