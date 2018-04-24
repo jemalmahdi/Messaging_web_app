@@ -798,7 +798,7 @@ user_view = UserView.as_view('user_view')
 app.add_url_rule('/user/', defaults={'user_id': None},
                  view_func=user_view, methods=['GET'])
 app.add_url_rule('/user/', view_func=user_view,
-                 methods=['POST']) 
+                 methods=['POST'])
 app.add_url_rule('/user/<int:user_id>', view_func=user_view,
                  methods=['GET'])
 app.add_url_rule('/user/<int:user_id>', view_func=user_view,
