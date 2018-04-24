@@ -7,7 +7,6 @@ import datetime
 from collections import OrderedDict
 
 app = Flask(__name__)
-
 app.config['DATABASE'] = os.path.join(app.root_path, 'Social.sqlite')
 
 
@@ -775,27 +774,27 @@ app.add_url_rule('/login/<int:login_id>', view_func=login_view,
 
 # Register MessageView as the handler for all the /message/ requests.
 message_view = MessageView.as_view('message_view')
-app.add_url_rule('/message/', defaults={'message_id': None},
+app.add_url_rule('/api/message/', defaults={'message_id': None},
                  view_func=message_view, methods=['GET'])
-app.add_url_rule('/message/', view_func=message_view,
+app.add_url_rule('/api/message/', view_func=message_view,
                  methods=['POST'])
 # For this you would need to provide the user_id through the form data. URL
 # values are only for message ID -Morgan
 # app.add_url_rule('/message/<int:user_id>', view_func=message_view,
 #                  methods=['POST'])  # Hey, should this be message? or POST
-app.add_url_rule('/message/<int:message_id>', view_func=message_view,
+app.add_url_rule('/api/message/<int:message_id>', view_func=message_view,
                  methods=['GET'])
-app.add_url_rule('/message/<int:message_id>', view_func=message_view,
+app.add_url_rule('/api/message/<int:message_id>', view_func=message_view,
                  methods=['DELETE'])
-app.add_url_rule('/message/<int:message_id>', view_func=message_view,
+app.add_url_rule('/api/message/<int:message_id>', view_func=message_view,
                  methods=['PUT'])
-app.add_url_rule('/message/<int:message_id>', view_func=message_view,
+app.add_url_rule('/api/message/<int:message_id>', view_func=message_view,
                  methods=['PATCH'])
 
 
 # Register UserView as the handler for all the /user/ requests.
 user_view = UserView.as_view('user_view')
-app.add_url_rule('/user/', defaults={'user_id': None},
+app.add_url_rule('/api/user/', defaults={'user_id': None},
                  view_func=user_view, methods=['GET'])
 app.add_url_rule('/user/', view_func=user_view,
                  methods=['POST']) 
@@ -803,22 +802,19 @@ app.add_url_rule('/user/<int:user_id>', view_func=user_view,
                  methods=['GET'])
 app.add_url_rule('/user/<int:user_id>', view_func=user_view,
                  methods=['DELETE'])
-app.add_url_rule('/user/<int:user_id>', view_func=user_view,
+app.add_url_rule('/api/user/<int:user_id>', view_func=user_view,
                  methods=['PUT'])
-app.add_url_rule('/user/<int:user_id>', view_func=user_view,
+app.add_url_rule('/api/user/<int:user_id>', view_func=user_view,
                  methods=['PATCH'])
 
 
 # Register ChatView as the handler for all the /chat/ requests.
 chat_view = ChatView.as_view('chat_view')
-app.add_url_rule('/chat/', defaults={'chat_id': None},
+app.add_url_rule('/api/chat/', defaults={'chat_id': None},
                  view_func=chat_view, methods=['GET'])
-app.add_url_rule('/chat/', view_func=chat_view,
+app.add_url_rule('/api/chat/', view_func=chat_view,
                  methods=['POST'])
-# Same issue as line 635
-# app.add_url_rule('/chat/<int:user_id>', view_func=chat_view,
-#                  methods=['POST'])
-app.add_url_rule('/chat/<int:user_id>', view_func=chat_view,
+app.add_url_rule('/api/chat/<int:user_id>', view_func=chat_view,
                  methods=['GET'])
-app.add_url_rule('/chat/<int:chat_id>', view_func=chat_view,
+app.add_url_rule('/api/chat/<int:chat_id>', view_func=chat_view,
                  methods=['DELETE'])
