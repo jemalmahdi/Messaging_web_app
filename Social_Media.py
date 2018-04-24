@@ -337,12 +337,142 @@ def login():
     return render_template('Login.html')
 
 
+@app.route('/new_user')
+def new_user():
+    """
+    Serves as a page to register a new account
+    """
+
+    return render_template('New_User.html')
+
+
+class LoginView(MethodView):
+    """
+    This view handles all the /login/ requests.
+    """
+
+    def get(self, login_id):
+        """
+        Handle GET requests.
+
+        Returns JSON representing all of the logins if login_id is None, or a
+        single login if login_id is not None.
+
+        :param login_id: id of a login, or None for all logins
+        :return: JSON response
+        """
+        if login_id is None:
+            login = get_all_rows('login')
+            return jsonify(login)
+        else:
+            login = query_by_id('login', login_id)
+
+            if login is not None:
+                response = jsonify(login)
+            else:
+                raise RequestError(404, 'user not found')
+
+            return response
+
+    def post(self):
+        """
+        Handles a POST request to insert a new login. Returns a JSON
+        response representing the new login.
+
+        The username must be provided in the requests's form data.
+
+        :return: a response containing the JSON representation of the login
+        """
+        if 'username' not in request.form:
+            raise RequestError(422, 'username required')
+        else:
+            if 'password' not in request.form:
+                raise RequestError(422, 'password required')
+            else:
+                response = jsonify(insert_login(request.form['username'],
+                                                request.form['password']))
+
+        return response
+
+    def delete(self, login_id):
+        """
+        Handles a DELETE request given a certain login_id
+
+        :param login_id: the id of the login to delete
+        :return: a response containing the JSON representation of the
+            old login
+        """
+
+        if login_id is None:
+            raise RequestError(422, 'login_id required')
+        else:
+            login = query_by_id('login', login_id)
+
+            if login is not None:
+                delete_item('login', login_id)
+            else:
+                raise RequestError(404, 'user not found')
+        return jsonify(login)
+
+    def put(self, login_id):
+        """
+        Handles a PUT request given a certain login_id
+
+        :param login_id: the id of the login to be put
+        :return: a response containing the JSON representation of the
+            new login
+        """
+
+        if login_id is None:
+            raise RequestError(422, 'Login_id is required')
+        else:
+            if 'username' not in request.form:
+                raise RequestError(422, 'Username is required')
+            else:
+                login = query_by_id('login', login_id)
+
+                if login is not None:
+                    #Need new function
+                    update_user(login_id, request.form['username'])
+                else:
+                    raise RequestError(404, 'user not found')
+                login = query_by_id('login', login_id)
+                return jsonify(login)
+
+    def patch(self, login_id):
+        """
+        Handles the PATCH request given a certain login_id
+
+        :param login_id: the id of the login to be patched
+        :return:a response containing the JSON representation of the
+            new login
+        """
+
+        if login_id is None:
+            raise RequestError(422, 'login_id is required')
+        else:
+            login = query_by_id('login', login_id)
+
+            if login is None:
+                raise RequestError(404, 'User not found')
+            else:
+
+                new_name = login['user_name']
+                if 'username' in request.form:
+                    new_name = request.form['username']
+
+                #Need new function
+                update_user(user_id, new_name)
+                login = query_by_id('login', login_id)
+                return jsonify(login)
+
+
 class MessageView(MethodView):
     def get(self, message_id):
         """
         Handle GET requests.
-        Returns JSON representing all of the message if message_id is None, or a
-        single message if message_id is not None.
+        Returns JSON representing all of the message if message_id is None, or
+        a single message if message_id is not None.
         :param message_id: id of a message, or None for all messages
         :return: JSON response
         """
@@ -398,6 +528,8 @@ class MessageView(MethodView):
     def put(self, message_id):
         """
         Handles a PUT request given a certain message_id
+
+        :param message_id: the id of the message to be put
         :return:a response containing the JSON representation of the
             new message
         """
@@ -422,6 +554,8 @@ class MessageView(MethodView):
     def patch(self, message_id):
         """
         Handles the PATCH request given a certain message_id
+
+        :param message_id: the id of the message to be patched
         :return:a response containing the JSON representation of the
             old message
         """
@@ -516,6 +650,8 @@ class UserView(MethodView):
     def put(self, user_id):
         """
         Handles a PUT request given a certain user_id
+
+        :param user_id: the id of the user to be put
         :return:a response containing the JSON representation of the
             new user
         """
@@ -541,7 +677,7 @@ class UserView(MethodView):
 
         :param user_id: the id of the user to be patched
         :return:a response containing the JSON representation of the
-            old user
+            new user
         """
 
         if user_id is None:
@@ -621,9 +757,22 @@ class ChatView(MethodView):
         return jsonify(chat)
 
 
-# Register MessageView as the handler for all the /message/ requests. For
-# more info
-# about what is going on here, see http://flask.pocoo.org/docs/0.12/views/
+# Register LoginView as the handler for all the /login/ requests.
+login_view = LoginView.as_view('login_view')
+app.add_url_rule('/login/', defaults={'login_id': None},
+                 view_func=login_view, methods=['GET'])
+app.add_url_rule('/login/', view_func=login_view,
+                 methods=['POST'])
+app.add_url_rule('/login/<int:login_id>', view_func=login_view,
+                 methods=['GET'])
+app.add_url_rule('/user/<int:login_id>', view_func=login_view,
+                 methods=['DELETE'])
+app.add_url_rule('/login/<int:login_id>', view_func=login_view,
+                 methods=['PUT'])
+app.add_url_rule('/login/<int:login_id>', view_func=login_view,
+                 methods=['PATCH'])
+
+# Register MessageView as the handler for all the /message/ requests.
 message_view = MessageView.as_view('message_view')
 app.add_url_rule('/api/message/', defaults={'message_id': None},
                  view_func=message_view, methods=['GET'])
@@ -647,11 +796,11 @@ app.add_url_rule('/api/message/<int:message_id>', view_func=message_view,
 user_view = UserView.as_view('user_view')
 app.add_url_rule('/api/user/', defaults={'user_id': None},
                  view_func=user_view, methods=['GET'])
-app.add_url_rule('/api/user/', view_func=user_view,
-                 methods=['POST'])  # Hey, should this be message? or POST
-app.add_url_rule('/api/user/<int:user_id>', view_func=user_view,
+app.add_url_rule('/user/', view_func=user_view,
+                 methods=['POST']) 
+app.add_url_rule('/user/<int:user_id>', view_func=user_view,
                  methods=['GET'])
-app.add_url_rule('/api/user/<int:uer_id>', view_func=user_view,
+app.add_url_rule('/user/<int:user_id>', view_func=user_view,
                  methods=['DELETE'])
 app.add_url_rule('/api/user/<int:user_id>', view_func=user_view,
                  methods=['PUT'])
