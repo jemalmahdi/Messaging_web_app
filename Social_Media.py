@@ -190,6 +190,38 @@ def insert_user(name, login_id):
     return dict(cur.fetchone())
 
 
+def insert_login(username, password):
+    """
+    Will insert a new user into the database and check to ensure the username
+    isn't taken. Also calls hash_and_salt() which will hash and salt the
+    password.
+
+    :param username: the username of a new user
+    :param password: the password of a new user
+    :return: a dictionary of the new user
+    """
+    conn = get_db()
+    cur = conn.cursor()
+
+    query = '''
+        SELECT * FROM login WHERE user_name = ?
+    '''
+
+    execute(query, (username,))
+
+    if cur.fetchone() is not None:
+        raise RequestError(422, "Username is taken")
+    else:
+        password = hash_and_salt(password)
+        cur.execute('INSERT INTO login(user_name, password) VALUES(?, ?)',
+                    (username, password))
+        conn.commit()
+
+    cur.execute('SELECT * FROM login WHERE user_name = ?', (username,))
+
+    return dict(cur.fetchone())
+
+
 def update_message(message, user_id, message_id):
     """
     will update a message that was sent and needs to be fixed, as indicated by
