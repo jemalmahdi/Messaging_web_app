@@ -1,9 +1,15 @@
 """
-
 flask-login.readthedocs.io
 
+To run the flask app:
+$ <activate virtual environment>
+$ pip install flask
+$ pip install WTForms
+$ pip install tabulate
 $ pip install flask_login
-
+$ pip install passlib
+$ export FLASK_APP=app_main.py
+$ flask run
 
 Investigated ways to implement a login system with flask, with Jemal Jemal. We
  went through the docs for flask-login and WTForms and decided that these were
@@ -12,7 +18,6 @@ Investigated ways to implement a login system with flask, with Jemal Jemal. We
  2) https://www.youtube.com/watch?v=zRwy8gtgJ1A
  The first was not to helpful. The second is just what we need, and we plan on
  meeting tomorrow to use it to help us implement the login.
-
 
 
 """
