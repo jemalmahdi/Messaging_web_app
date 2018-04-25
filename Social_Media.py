@@ -333,7 +333,7 @@ def login():
     return render_template('Login.html')
 
 
-@app.route('/new_user')
+@app.route('/register')
 def new_user():
     """
     Serves as a page to register a new account
@@ -806,7 +806,7 @@ app.add_url_rule('/api/chat/<int:chat_id>', view_func=chat_view,
 chatrel_view = ChatRelView.as_view('chatrel_view')
 app.add_url_rule('/chatrel/', defaults={'chatrel_id': None},
                  view_func=chatrel_view, methods=['GET'])
-app.add_url_rule('/login/', view_func=login_view,
+app.add_url_rule('/chatrel/', view_func=chatrel_view,
                  methods=['POST'])
 app.add_url_rule('/chatrel/<int:chatrel_id>', view_func=chatrel_view,
                  methods=['GET'])
