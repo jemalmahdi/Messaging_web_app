@@ -17,21 +17,17 @@ def init_db():
     conn = get_db()
 
     query = '''
-        DROP TABLE IF EXISTS login;
         DROP TABLE IF EXISTS user;
         DROP TABLE IF EXISTS chat_rel;
         DROP TABLE IF EXISTS chat;
         DROP TABLE IF EXISTS message;
-        CREATE TABLE login(
-            id INTEGER PRIMARY KEY,
-            user_name TEXT UNIQUE,
-            password TEXT
-        );
+
         CREATE TABLE user (
             id INTEGER PRIMARY KEY,
             name TEXT,
-            login_id INTEGER,
-            FOREIGN KEY(login_id) REFERENCES login(id)           
+            email TEXT UNIQUE,
+            username TEXT UNIQUE,
+            password TEXT
         );
         CREATE TABLE chat_rel(
             id INTEGER PRIMARY KEY,

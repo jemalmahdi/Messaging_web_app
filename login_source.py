@@ -25,18 +25,24 @@ Investigated ways to implement a login system with flask, with Jemal Jemal. We
 __author__ = 'Vajpeyi_Jemal'
 
 import os
+from  Social_Media import *
 from flask import *
 from flask.ext.login import LoginManager, UserMixin, \
                                 login_required, login_user, logout_user
 
-from passlib.hash import sha256_crypt
-
+from passlib.hash import sha256_crypt # a hash algorithm that encrypts password
+from wtforms import Form, StringField, TextAreaField, PasswordField, validators
+from functools import wraps
 
 app = Flask(__name__)
 
 app.config['DATABASE'] = os.path.join(app.root_path, 'Social.sqlite')
 app.config["SECRET_KEY"] = 'thisissecret'
-# init DB
+
+# init DB if no db present (FOR NOW WE ARE JUST INITING, NEED TO DO THE CHECK OTHER TIMES)
+
+
+
 
 # flask-login
 login_manager = LoginManager() # allows Flask-Login
@@ -104,13 +110,24 @@ def index():
 
 # Register Form Class
 class RegisterForm(Form):
-    name = StringField('Name', [validators.Length(min=1, max=50)])
-    username = StringField('Username', [validators.Length(min=4, max=25)])
-    email = StringField('Email', [validators.Length(min=6, max=50)])
-    password = PasswordField('Password', [
-        validators.DataRequired(),
-        validators.EqualTo('confirm', message='Passwords do not match')
-    ])
+    """
+    This connects the html registeration form fields corresponding to the
+    rendered HTML page's fields. The validators set requirements on the form
+    fields.
+
+    Inherits from Form. See http://flask.pocoo.org/snippets/135/
+    """
+    name = StringField('Name',
+                       [validators.Length(min=1, max=50)])
+    username = StringField('Username',
+                           [validators.Length(min=4, max=25)])
+    email = StringField('Email',
+                        [validators.Length(min=6, max=50)])
+    password = PasswordField('Password',
+                             [validators.DataRequired(),
+                              validators.EqualTo('confirm',
+                                                 message='Incorrect Password')
+                              ])
     confirm = PasswordField('Confirm Password')
 
 
@@ -119,27 +136,31 @@ class RegisterForm(Form):
 def register():
     form = RegisterForm(request.form)
     if request.method == 'POST' and form.validate():
+        # check if there is a post request and if the data inputted to form
+        # is in the correct format (if it has been validated)
         name = form.name.data
         email = form.email.data
         username = form.username.data
         password = sha256_crypt.encrypt(str(form.password.data))
 
         # Create cursor
-        cur = mysql.connection.cursor()
+        conn = get_db()
+        cur = conn.cursor()
 
         # Execute query
-        cur.execute("INSERT INTO users(name, email, username, password) VALUES(%s, %s, %s, %s)", (name, email, username, password))
+        cur.execute("INSERT INTO user(name, email, username, password) "
+                    "VALUES(?, ?, ?, ?)", (name, email, username, password))
 
         # Commit to DB
-        mysql.connection.commit()
+        conn.commit()
 
-        # Close connection
-        cur.close()
+        # Flash a message to the HTML cause we just registered babbyyyyyy
+        flash('Congratulations! You have sold your soul to WooMessages! Next '
+              'time, read terms and conditions. Proceed to Login.', 'success')
 
-        flash('You are now registered and can log in', 'success')
-
+        # now that registered, send to login site
         return redirect(url_for('login'))
-    return render_template('register.html', form=form)
+    return render_template('RegisterationPage.html', form=form)
 
 
 # User login
@@ -151,31 +172,35 @@ def login():
         password_candidate = request.form['password']
 
         # Create cursor
-        cur = mysql.connection.cursor()
+        conn = get_db()
+        cur = conn.cursor()
 
         # Get user by username
-        result = cur.execute("SELECT * FROM users WHERE username = %s", [username])
+        result = cur.execute("SELECT * FROM user WHERE username = %s",
+                             [username])
 
         if result > 0:
             # Get stored hash
             data = cur.fetchone()
             password = data['password']
 
-            # Compare Passwords
+            # Compare Password entered to password saved in DB
             if sha256_crypt.verify(password_candidate, password):
-                # Passed
+                # yay! The passwords match
                 session['logged_in'] = True
                 session['username'] = username
+                welcome_text = "Welcome back, " + str(data['name'])
 
-                flash('You are now logged in', 'success')
+                flash(welcome_text, 'success')
                 return redirect(url_for('dashboard'))
             else:
                 error = 'Invalid login'
+                flash("Invalid login", 'danger')
                 return render_template('login.html', error=error)
-            # Close connection
-            cur.close()
+
         else:
             error = 'Username not found'
+            flash("WHO IS U??? Username not found", 'danger')
             return render_template('login.html', error=error)
 
     return render_template('login.html')
@@ -213,4 +238,5 @@ def page_not_found(e):
 
 
 if __name__ == "__main__":
-    app.run()
+    app.secret_key='WooMessagesKeepsSecrets'
+    app.run(debug=True)
