@@ -37,10 +37,7 @@ where all the active chats that the user is in are displayed.
 
 """
 
-__author__ = 'Vajpeyi_Jemal'
-
-import os
-from  Social_Media import *
+from Social_Media import *
 from flask import *
 from flask.ext.login import LoginManager, UserMixin, \
                                 login_required, login_user, logout_user
@@ -54,17 +51,16 @@ app = Flask(__name__)
 app.config['DATABASE'] = os.path.join(app.root_path, 'Social.sqlite')
 app.config["SECRET_KEY"] = 'thisissecret'
 
+
 # init DB if no db present (FOR NOW WE ARE JUST INITING, NEED TO DO THE CHECK OTHER TIMES)
 
 
-
-
 # flask-login
-login_manager = LoginManager() # allows Flask-Login
-login_manager.init_app(app) # Once app obj created this configures it for login
-login_manager.login_view = "login" # asdasda
+login_manager = LoginManager()  # allows Flask-Login
+login_manager.init_app(app)  # Once app obj created, configures it for login
+login_manager.login_view = "login"
 
-# silly user model
+
 class User(UserMixin):
     """
     Inherits from UserMixin that implments:
