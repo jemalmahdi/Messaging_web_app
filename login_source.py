@@ -8,7 +8,7 @@ $ pip install WTForms
 $ pip install tabulate
 $ pip install flask_login
 $ pip install passlib
-$ export FLASK_APP=app_main.py
+$ export FLASK_APP=login_source
 $ flask run
 
 Investigated ways to implement a login system with flask, with Jemal Jemal. We
@@ -19,6 +19,21 @@ Investigated ways to implement a login system with flask, with Jemal Jemal. We
  The first was not to helpful. The second is just what we need, and we plan on
  meeting tomorrow to use it to help us implement the login.
 
+
+24th April afternoon
+Spoke with Isaac, Morgan and Jemal discussing the studtures of the tables and
+divying up work. Set a timeline for when certain work is due by.
+
+24th April evening
+Pair-prgramming with Jemal to set up the Registeration. Used WTFform tutorials,
+and bootstrap examples. Also relied on code snippets from
+http://flask.pocoo.org/snippets/98/
+
+25th April morning
+Wrapped up the the login code. A user can now register and then log into our
+website. There are validation checks in both the login and registeration page.
+The password is encrypted. Upon Loging in, the user is moved to a dashboard
+where all the active chats that the user is in are displayed.
 
 """
 
@@ -169,44 +184,55 @@ def login():
     if request.method == 'POST':
         # Get Form Fields
         username = request.form['username']
-        password_candidate = request.form['password']
+        password_entered = request.form['password']
 
         # Create cursor
         conn = get_db()
         cur = conn.cursor()
 
         # Get user by username
-        result = cur.execute("SELECT * FROM user WHERE username = %s",
-                             [username])
+        cur.execute('SELECT * FROM user WHERE username = ?', (username,))
+        data = cur.fetchall()
+        num_rows = len(data)
 
-        if result > 0:
+        print(username)
+        print(num_rows)
+
+        # if the returned number of rows > 1 then user found
+        if num_rows == 1:
             # Get stored hash
-            data = cur.fetchone()
-            password = data['password']
+            userdata = data[0]
+            password_real = userdata['password']
 
             # Compare Password entered to password saved in DB
-            if sha256_crypt.verify(password_candidate, password):
+            if sha256_crypt.verify(password_entered, password_real):
                 # yay! The passwords match
                 session['logged_in'] = True
                 session['username'] = username
-                welcome_text = "Welcome back, " + str(data['name'])
+                welcome_text = "Welcome back, " + str(userdata['name'])
 
                 flash(welcome_text, 'success')
                 return redirect(url_for('dashboard'))
             else:
-                error = 'Invalid login'
-                flash("Invalid login", 'danger')
-                return render_template('login.html', error=error)
+                error = 'Invalid password'
+                flash("Invalid password", 'danger')
+                return render_template('Login.html', error=error)
 
         else:
             error = 'Username not found'
             flash("WHO IS U??? Username not found", 'danger')
             return render_template('login.html', error=error)
 
-    return render_template('login.html')
+    return render_template('Login.html')
 
 # Check if user logged in
 def is_logged_in(f):
+    """
+    Code adapted from http://flask.pocoo.org/snippets/98/
+
+    :param f:
+    :return:
+    """
     @wraps(f)
     def wrap(*args, **kwargs):
         if 'logged_in' in session:
@@ -221,7 +247,7 @@ def is_logged_in(f):
 @is_logged_in
 def logout():
     session.clear()
-    flash('You are now logged out', 'success')
+    flash('Logged out!', 'success')
     return redirect(url_for('login'))
 
 
@@ -234,7 +260,41 @@ def page_not_found(e):
     :param e:
     :return:
     """
-    return Response('<p>Login failed</p>')
+    return Response('<p>Login failed!</p>')
+
+
+# Dashboard
+@app.route('/dashboard')
+@is_logged_in
+def dashboard():
+    """
+
+
+    :return:
+    """
+    # Create cursor
+    # conn = get_db()
+    # cur = conn.cursor()
+    #
+    # # Get user's active chats
+    # cur.execute('SELECT chat.name FROM user, chat WHERE user.id = chat.user_id AND username = ?', (username,))
+    # data = cur.fetchall()
+    # num_rows = len(data)
+    #
+    # # Get list of active messages from chat rel [FETCHALL]
+    # data = cur.fetchall()
+    # num_rows = len(data)
+
+    data = None
+    num_rows = 0
+
+    if num_rows > 0:
+        return render_template('dashboard.html', active_chats=data)
+    else:
+        msg = 'No active chats'
+        return render_template('dashboard.html', msg=msg)
+    # Close connection
+    cur.close()
 
 
 if __name__ == "__main__":

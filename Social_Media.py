@@ -37,6 +37,7 @@ def init_db():
             FOREIGN KEY(user_id) REFERENCES user(id)
         );
         CREATE TABLE chat(
+            title TEXT,
             message_id INTEGER PRIMARY KEY,
             time TEXT,
             id INTEGER,
