@@ -21,7 +21,6 @@ def init_db():
         DROP TABLE IF EXISTS chat_rel;
         DROP TABLE IF EXISTS chat;
         DROP TABLE IF EXISTS message;
-
         CREATE TABLE user (
             id INTEGER PRIMARY KEY,
             name TEXT,
@@ -343,31 +342,31 @@ def new_user():
     return render_template('New_User.html')
 
 
-class LoginView(MethodView):
+class ChatRelView(MethodView):
     """
-    This view handles all the /login/ requests.
+    This view handles all the /chatrel/ requests.
     """
 
-    def get(self, login_id):
+    def get(self, chatrel_id):
         """
         Handle GET requests.
 
         Returns JSON representing all of the logins if login_id is None, or a
         single login if login_id is not None.
 
-        :param login_id: id of a login, or None for all logins
+        :param chatrel_id: id of a login, or None for all logins
         :return: JSON response
         """
-        if login_id is None:
-            login = get_all_rows('login')
-            return jsonify(login)
+        if chatrel_id is None:
+            chatrel = get_all_rows('chat_rel')
+            return jsonify(chatrel)
         else:
-            login = query_by_id('login', login_id)
+            chatrel = query_by_id('chat_rel', chatrel_id)
 
-            if login is not None:
-                response = jsonify(login)
+            if chatrel is not None:
+                response = jsonify(chatrel)
             else:
-                raise RequestError(404, 'user not found')
+                raise RequestError(404, 'chat relation not found')
 
             return response
 
@@ -380,6 +379,7 @@ class LoginView(MethodView):
 
         :return: a response containing the JSON representation of the login
         """
+        #Still working this one out.
         if 'username' not in request.form:
             raise RequestError(422, 'username required')
         else:
@@ -391,7 +391,7 @@ class LoginView(MethodView):
 
         return response
 
-    def delete(self, login_id):
+    def delete(self, chatrel_id):
         """
         Handles a DELETE request given a certain login_id
 
@@ -400,18 +400,18 @@ class LoginView(MethodView):
             old login
         """
 
-        if login_id is None:
-            raise RequestError(422, 'login_id required')
+        if chatrel_id is None:
+            raise RequestError(422, 'chatrel_id required')
         else:
-            login = query_by_id('login', login_id)
+            chat = query_by_id('chat_rel', chatrel_id)
 
-            if login is not None:
-                delete_item('login', login_id)
+            if chat is not None:
+                delete_item('chat_rel', chatrel_id)
             else:
-                raise RequestError(404, 'user not found')
-        return jsonify(login)
+                raise RequestError(404, 'Chat rel not found')
+        return jsonify(chat)
 
-    def put(self, login_id):
+    def put(self, chatrel_id):
         """
         Handles a PUT request given a certain login_id
 
@@ -420,23 +420,23 @@ class LoginView(MethodView):
             new login
         """
 
-        if login_id is None:
-            raise RequestError(422, 'Login_id is required')
+        if chatrel_id is None:
+            raise RequestError(422, 'chatrel_id is required')
         else:
-            if 'username' not in request.form:
-                raise RequestError(422, 'Username is required')
+            if 'user_id' not in request.form:
+                raise RequestError(422, 'User_id is required')
             else:
-                login = query_by_id('login', login_id)
+                chat = query_by_id('chat_rel', chatrel_id)
 
-                if login is not None:
+                if chat is not None:
                     #Need new function
-                    update_user(login_id, request.form['username'])
+                    update_user(chatrel_id, request.form['user_id'])
                 else:
-                    raise RequestError(404, 'user not found')
-                login = query_by_id('login', login_id)
-                return jsonify(login)
+                    raise RequestError(404, 'chat not found')
+                chat = query_by_id('chat_rel', chatrel_id)
+                return jsonify(chat)
 
-    def patch(self, login_id):
+    def patch(self, chatrel_id):
         """
         Handles the PATCH request given a certain login_id
 
@@ -445,23 +445,21 @@ class LoginView(MethodView):
             new login
         """
 
-        if login_id is None:
-            raise RequestError(422, 'login_id is required')
+        if chatrel_id is None:
+            raise RequestError(422, 'chatrel_id is required')
         else:
-            login = query_by_id('login', login_id)
-
-            if login is None:
-                raise RequestError(404, 'User not found')
+            if 'user_id' not in request.form:
+                raise RequestError(422, 'User_id is required')
             else:
+                chat = query_by_id('chat_rel', chatrel_id)
 
-                new_name = login['user_name']
-                if 'username' in request.form:
-                    new_name = request.form['username']
-
-                #Need new function
-                update_user(user_id, new_name)
-                login = query_by_id('login', login_id)
-                return jsonify(login)
+                if chat is not None:
+                    #Need new function
+                    update_user(chatrel_id, request.form['user_id'])
+                else:
+                    raise RequestError(404, 'chat not found')
+                chat = query_by_id('chat_rel', chatrel_id)
+                return jsonify(chat)
 
 
 class MessageView(MethodView):
@@ -756,21 +754,6 @@ class ChatView(MethodView):
         return jsonify(chat)
 
 
-# Register LoginView as the handler for all the /login/ requests.
-login_view = LoginView.as_view('login_view')
-app.add_url_rule('/login/', defaults={'login_id': None},
-                 view_func=login_view, methods=['GET'])
-app.add_url_rule('/login/', view_func=login_view,
-                 methods=['POST'])
-app.add_url_rule('/login/<int:login_id>', view_func=login_view,
-                 methods=['GET'])
-app.add_url_rule('/user/<int:login_id>', view_func=login_view,
-                 methods=['DELETE'])
-app.add_url_rule('/login/<int:login_id>', view_func=login_view,
-                 methods=['PUT'])
-app.add_url_rule('/login/<int:login_id>', view_func=login_view,
-                 methods=['PATCH'])
-
 # Register MessageView as the handler for all the /message/ requests.
 message_view = MessageView.as_view('message_view')
 app.add_url_rule('/api/message/', defaults={'message_id': None},
@@ -817,3 +800,19 @@ app.add_url_rule('/api/chat/<int:user_id>', view_func=chat_view,
                  methods=['GET'])
 app.add_url_rule('/api/chat/<int:chat_id>', view_func=chat_view,
                  methods=['DELETE'])
+
+
+# Register ChatRelView as the handler for all the /login/ requests.
+chatrel_view = ChatRelView.as_view('chatrel_view')
+app.add_url_rule('/chatrel/', defaults={'chatrel_id': None},
+                 view_func=chatrel_view, methods=['GET'])
+app.add_url_rule('/login/', view_func=login_view,
+                 methods=['POST'])
+app.add_url_rule('/chatrel/<int:chatrel_id>', view_func=chatrel_view,
+                 methods=['GET'])
+app.add_url_rule('/chatrel/<int:chatrel_id>', view_func=chatrel_view,
+                 methods=['DELETE'])
+app.add_url_rule('/chatrel/<int:chatrel_id>', view_func=chatrel_view,
+                 methods=['PUT'])
+app.add_url_rule('/chatrel/<int:chatrel_id>', view_func=chatrel_view,
+                 methods=['PATCH'])
