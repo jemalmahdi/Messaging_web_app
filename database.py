@@ -159,6 +159,29 @@ def update_message(text, user_id, message_id):
     return dict(cur.fetchone())
 
 
+def update_user(user_id, name):
+    """
+    Wil update a username given a specific user_id
+    :param user_id: the id of the user to be updated
+    :param name: the updated username
+    :return: a dictionary representing the new, updated user
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    query = '''
+        UPDATE user SET name = ? WHERE id = ?
+    '''
+
+    cur.execute(query, (name, user_id))
+    conn.commit()
+
+    cur.execute('SELECT * FROM user WHERE id = ?', (user_id,))
+
+    return dict(cur.fetchone())
+
+
 def delete_item(table_name, item_id):
     """
     This function deletes items with item_id from table_name
