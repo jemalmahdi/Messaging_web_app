@@ -45,6 +45,7 @@ from flask.ext.login import LoginManager, UserMixin, \
 from passlib.hash import sha256_crypt # a hash algorithm that encrypts password
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from functools import wraps
+import os
 
 app = Flask(__name__)
 
