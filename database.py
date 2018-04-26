@@ -42,11 +42,11 @@ def init_db():
             FOREIGN KEY(chat_id) REFERENCES chat(id)
         );
         CREATE TABLE chat(
-            title TEXT,
-            message_id INTEGER PRIMARY KEY,
-            time TEXT,
             id INTEGER,
-            FOREIGN KEY(id) REFERENCES chat_rel(chat_id)
+            title TEXT,
+            time TEXT,
+            message_id INTEGER PRIMARY KEY,
+            FOREIGN KEY(message_id) REFERENCES message(id)
         );
         CREATE TABLE message (
             message TEXT,
