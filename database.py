@@ -37,8 +37,9 @@ def init_db():
         CREATE TABLE chat_rel(
             id INTEGER PRIMARY KEY,
             user_id INTEGER,
-            chat_id INTEGER UNIQUE,
-            FOREIGN KEY(user_id) REFERENCES user(id)
+            chat_id INTEGER,
+            FOREIGN KEY(user_id) REFERENCES user(id),
+            FOREIGN KEY(chat_id) REFERENCES chat(id)
         );
         CREATE TABLE chat(
             title TEXT,
