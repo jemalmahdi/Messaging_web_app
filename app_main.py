@@ -423,7 +423,7 @@ def initdb_command():
 @click.argument('filename')
 def convert_csv_to_sqlite_command(filename):
     convert_csv_to_sqlite(filename)
-    print('Inserted' + filename+'data into music.sqlite')
+    print('Inserted' + filename)
 
 
 @app.route('/')
