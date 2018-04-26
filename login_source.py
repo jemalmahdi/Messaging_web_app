@@ -37,6 +37,7 @@ where all the active chats that the user is in are displayed.
 
 """
 
+from database import *
 from Social_Media import *
 from flask import *
 from flask.ext.login import LoginManager, UserMixin, \
@@ -246,7 +247,6 @@ def logout():
     session.clear()
     flash('Logged out!', 'success')
     return redirect(url_for('login'))
-
 
 
 # handle login failed
