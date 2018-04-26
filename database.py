@@ -76,11 +76,18 @@ def convert_csv_to_sqlite(filename):
     init_db()  # creates database tables if non-existant
 
     for row in csv_row_generator(filename):
-        insert_table_info(artist_name=row['Artist_Name'],
-                          artist_age=row['Artist_Age'],
-                          album_name=row['Album_Name'],
-                          track_name=row['Track_Name'],
-                          track_duration=row['Track_Duration'], )
+        user_id = insert_user(row['Name'], row['Email'], row['Username'],
+                              row['Password'])
+        content = user_id.json()
+        user_id = content['username']
+        message_id = insert_message(row['Message'], row['Time'], user_id,
+                                    chat_id)
+        content = message_id.json()
+        message_id = content['id']
+        chat_id = insert_chat(row['Title'], row['Time'], message_id)
+        content = chat_id.json()
+        chat_id = content['id']
+        insert_chat_rel(user_id, chat_id)
 
 
 def csv_row_generator(filename):
