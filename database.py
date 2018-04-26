@@ -39,22 +39,24 @@ def init_db():
             user_id INTEGER,
             chat_id INTEGER UNIQUE,
             FOREIGN KEY(user_id) REFERENCES user(id)
+            FOREIGN KEY(chat_id) REFERENCES chat(id)
         );
         CREATE TABLE chat(
+            id INTEGER PRIMARY KEY,
             title TEXT,
-            message_id INTEGER PRIMARY KEY,
+            message_id INTEGER,
             time TEXT,
-            id INTEGER,
-            FOREIGN KEY(id) REFERENCES chat_rel(chat_id)
+            FOREIGN KEY(message_id) REFERENCES message(id)
         );
         CREATE TABLE message (
+            id INTEGER PRIMARY KEY,
             message TEXT,
             time TEXT,
             user_id INTEGER,
-            id INTEGER,
+            chat_id INTEGER,
             FOREIGN KEY(user_id) REFERENCES user(id),
-            FOREIGN KEY(id) REFERENCES chat(id)
-        );                    
+            FOREIGN KEY(chat_id) REFERENCES chat(id)
+        );
     '''
 
     conn.cursor().executescript(query)
@@ -127,18 +129,66 @@ def get_date():
     return now.strftime("%Y-%m-%d %H:%M")
 
 
-def insert_message(message, user_id):
+def insert_user(name, email, username, password):
     conn = get_db()
     cur = conn.cursor()
 
-    query = '''
-        INSERT INTO message(message, time, user_id) VALUES(?, ?, ?)
-    '''
+    cur.execute('INSERT INTO user(name, email, username, password)'
+                'VALUES(?, ?, ?, ?)', (name, email, username, password))
 
-    cur.execute(query, (message, get_date(), user_id))
     conn.commit()
 
-    cur.execute('SELECT * FROM message WHERE id = ?', (cur.lastrowid,))
+    user_id = cur.lastrowid
+
+    cur.execute('SELECT * FROM user WHERE id = ?', (user_id,))
+
+    return dict(cur.fetchone())
+
+
+def insert_message(message, time, user_id, chat_id):
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute('INSERT INTO message(message, time, user_id, chat_id)'
+                'VALUES(?, ?, ?, ?)', (message, time, user_id, chat_id))
+
+    conn.commit()
+
+    message_id = cur.lastrowid
+
+    cur.execute('SELECT * FROM message WHERE id = ?', (message_id,))
+
+    return dict(cur.fetchone())
+
+
+def insert_chat(title, time, message_id):
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute('INSERT INTO chat(title, time, message_id)'
+                'VALUES(?, ?, ?)', (title, time, message_id))
+
+    conn.commit()
+
+    chat_id = cur.lastrowid
+
+    cur.execute('SELECT * FROM chat WHERE id = ?', (chat_id,))
+
+    return dict(cur.fetchone())
+
+
+def insert_chat_rel(user_id, chat_id):
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute('INSERT INTO chat_rel(user_id, chat_id)'
+                'VALUES(?, ?)', (user_id, chat_id))
+
+    conn.commit()
+
+    chat_rel_id = cur.lastrowid
+
+    cur.execute('SELECT * FROM chat_rel WHERE id = ?', (chat_rel_id,))
 
     return dict(cur.fetchone())
 
