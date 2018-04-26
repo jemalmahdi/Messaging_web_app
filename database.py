@@ -49,12 +49,13 @@ def init_db():
             FOREIGN KEY(message_id) REFERENCES message(id)
         );
         CREATE TABLE message (
+            id INTEGER PRIMARY KEY,
             message TEXT,
             time TEXT,
             user_id INTEGER,
-            id INTEGER,
+            chat_id INTEGER,
             FOREIGN KEY(user_id) REFERENCES user(id),
-            FOREIGN KEY(id) REFERENCES chat(id)
+            FOREIGN KEY(chat_id) REFERENCES chat(id)
         );                    
     '''
 
