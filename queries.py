@@ -51,3 +51,4 @@ def get_all_rows(table_name):
         results.append(dict(row))
 
     return results
+
