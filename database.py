@@ -73,6 +73,7 @@ def convert_csv_to_sqlite(filename):
     init_db()  # creates database tables if non-existant
 
     for row in csv_row_generator(filename):
+
         insert_table_info(username=row['Username'],
                           password=row['Password'],
                           name=row['Name'],
@@ -81,6 +82,7 @@ def convert_csv_to_sqlite(filename):
                           message_time=row['Time'],
                           message_content=row['Message'],
                           )
+
 
 
 def csv_row_generator(filename):
