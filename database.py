@@ -44,9 +44,7 @@ def init_db():
         CREATE TABLE chat(
             id INTEGER PRIMARY KEY,
             title TEXT,
-            message_id INTEGER,
-            time TEXT,
-            FOREIGN KEY(message_id) REFERENCES message(id)
+            time TEXT
         );
         CREATE TABLE message (
             id INTEGER PRIMARY KEY,
@@ -80,13 +78,13 @@ def convert_csv_to_sqlite(filename):
                               row['Password'])
         content = user_id.json()
         user_id = content['username']
-        message_id = insert_message(row['Message'], row['Time'], user_id,
-                                    chat_id)
-        content = message_id.json()
-        message_id = content['id']
-        chat_id = insert_chat(row['Title'], row['Time'], message_id)
-        content = chat_id.json()
-        chat_id = content['id']
+        if check_chat(row['Title']) is 0:
+            chat_id = insert_chat(row['Title'], row['Time'])
+            content = chat_id.json()
+            chat_id = content['id']
+        else:
+            chat_id =
+        insert_message(row['Message'], row['Time'], user_id, chat_id)
         insert_chat_rel(user_id, chat_id)
 
 
@@ -168,12 +166,12 @@ def insert_message(message, time, user_id, chat_id):
     return dict(cur.fetchone())
 
 
-def insert_chat(title, time, message_id):
+def insert_chat(title, time):
     conn = get_db()
     cur = conn.cursor()
 
-    cur.execute('INSERT INTO chat(title, time, message_id)'
-                'VALUES(?, ?, ?)', (title, time, message_id))
+    cur.execute('INSERT INTO chat(title, time)'
+                'VALUES(?, ?)', (title, time))
 
     conn.commit()
 
@@ -256,3 +254,28 @@ def delete_item(table_name, item_id):
     conn.commit()
 
     return None
+
+
+def check_chat(title):
+    """
+    THis function will only be called when filling a csv. That is to ensure
+    that multiple chats aren't created when originally populating the database
+
+    :param title: the title of a chat
+    :return: 0 if the chat doesn't exist. the chat id otherwise.
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    query = '''
+        SELECT * FROM chat WHERE title = ?
+    '''
+
+    cur.execute(query, (title,))
+
+    content = cur.fetchone()
+    if content is not None:
+        return content['id']
+    else:
+        return 0
