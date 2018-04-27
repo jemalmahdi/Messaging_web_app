@@ -78,12 +78,11 @@ def convert_csv_to_sqlite(filename):
                               row['Password'])
         content = user_id.json()
         user_id = content['username']
+        chat_id = check_chat(row['Title'])
         if check_chat(row['Title']) is 0:
             chat_id = insert_chat(row['Title'], row['Time'])
             content = chat_id.json()
             chat_id = content['id']
-        else:
-            chat_id =
         insert_message(row['Message'], row['Time'], user_id, chat_id)
         insert_chat_rel(user_id, chat_id)
 
