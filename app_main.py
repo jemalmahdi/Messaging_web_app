@@ -419,6 +419,7 @@ from database import *
 from Social_Media import *
 from exception_classes import *
 from queries import *
+from custom_forms import *
 import tabulate
 
 
@@ -589,16 +590,77 @@ def dashboard():
     # data = cur.fetchall()
     # num_rows = len(data)
 
-    data = None
+    data = get_chat_rooms(1)
+
     num_rows = 0
+    if data is not None:
+        num_rows = 1
 
     if num_rows > 0:
-        return render_template('dashboard.html', active_chats=data)
+        return render_template('dashboard.html', chats=data)
     else:
         msg = 'No active chats'
         return render_template('dashboard.html', msg=msg)
     # Close connection
     cur.close()
+
+
+##############################################################################
+
+# Chats
+@app.route('/chat_rooms')
+def chat_rooms():
+
+    result = get_chat_rooms()  # chat titles, participants, creation times
+
+    if result > 0:
+        return render_template('chat_rooms.html', chat_rooms=result)
+    else:
+        msg = 'No Articles Found'
+        return render_template('chat_rooms.html', msg=msg)
+
+
+#Single chat room
+@app.route('/chat_room/<string:id>/')
+def chat_room(id):
+    # SQL SHIT TO GET MESSAGES
+    data = get_messages_in_chatroom(id);
+
+    # at the bottom of the page we need a post
+    return render_template('chat_room.html', chat_room= data)
+
+
+
+# Add chat room
+@app.route('/add_chat', methods=['GET', 'POST'])
+@is_logged_in
+def add_chat():
+    form = ChatRoomForm(request.form)
+    if request.method == 'POST' and form.validate():
+        title = form.title.data
+        body = form.body.data
+
+        ## SQL SHIT TO INSERT CHAT ROOM AND PARTICIPANTS
+
+        flash('Article Created', 'success')
+
+        return redirect(url_for('dashboard'))
+
+    return render_template('add_chat.html', form=form)
+
+
+# Delete chat room
+@app.route('/delete_chat/<string:id>', methods=['POST'])
+@is_logged_in
+def delete_chat(id):
+    ## SQL shit to delete chat
+
+    flash('Article Deleted', 'success')
+
+    return redirect(url_for('dashboard'))
+
+
+##############################################################################
 
 @app.errorhandler(RequestError)
 def handle_invalid_usage(error):
