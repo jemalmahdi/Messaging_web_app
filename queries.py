@@ -52,3 +52,23 @@ def get_all_rows(table_name):
 
     return results
 
+
+def get_user_by_username(username):
+    """
+    Returns a dictionary of one user
+
+    :param username: the username of the user being searched for
+    :return: a dictinary of the user
+    """
+    # Create cursor
+    conn = get_db()
+    cur = conn.cursor()
+
+    # Get user by username
+    cur.execute('SELECT * FROM user WHERE username = ?', (username,))
+    results = cur.fetchall()
+
+    if len(results) == 1:
+        return dict(results[0])
+    else:
+        return None
