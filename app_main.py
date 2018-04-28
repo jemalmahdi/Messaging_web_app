@@ -426,9 +426,9 @@ app = Flask(__name__)
 app.config['DATABASE'] = os.path.join(app.root_path, 'WooMessages.sqlite')
 app.config["SECRET_KEY"] = 'thisissecret'
 app.config.update(
-    DATABASE=os.path.join(app.root_path, 'Social.sqlite'),
+    DATABASE=os.path.join(app.root_path, 'WooMessages.sqlite'),
     DEBUG=True,
-    SECRET_KEY='secret_xxx'
+    SECRET_KEY='thisissecret'
 )
 
 # flask-login
@@ -476,21 +476,12 @@ def register():
     if request.method == 'POST' and form.validate():
         # check if there is a post request and if the data inputted to form
         # is in the correct format (if it has been validated)
-        name = form.name.data
-        email = form.email.data
-        username = form.username.data
-        password = sha256_crypt.encrypt(str(form.password.data))
 
-        # Create cursor
-        conn = get_db()
-        cur = conn.cursor()
+        insert_user(name = form.name.data,
+                    email=form.email.data,
+                    username=form.username.data,
+                    password=form.password.data)
 
-        # Execute query
-        cur.execute("INSERT INTO user(name, email, username, password) "
-                    "VALUES(?, ?, ?, ?)", (name, email, username, password))
-
-        # Commit to DB
-        conn.commit()
 
         # Flash a message to the HTML cause we just registered babbyyyyyy
         flash('Congratulations! You have sold your soul to WooMessages! Next '
@@ -498,7 +489,7 @@ def register():
 
         # now that registered, send to login site
         return redirect(url_for('login'))
-    return render_template('RegisterationPage.html', form=form)
+    return render_template('RegisterationPage.html', form=form) # default GET
 
 
 # User login
@@ -509,22 +500,11 @@ def login():
         username = request.form['username']
         password_entered = request.form['password']
 
-        # Create cursor
-        conn = get_db()
-        cur = conn.cursor()
+        userdata = get_user_by_username(username)
 
-        # Get user by username
-        cur.execute('SELECT * FROM user WHERE username = ?', (username,))
-        data = cur.fetchall()
-        num_rows = len(data)
-
-        print(username)
-        print(num_rows)
-
-        # if the returned number of rows > 1 then user found
-        if num_rows == 1:
+        # if the returned data is for a user
+        if userdata is not None:
             # Get stored hash
-            userdata = data[0]
             password_real = userdata['password']
 
             # Compare Password entered to password saved in DB
@@ -630,6 +610,7 @@ def handle_invalid_usage(error):
     """
     return error.to_response()
 
+
 def add_view_rules(view, view_url):
     """
     Adds rules to a custom MethodView. Preconditions are that the custom
@@ -685,6 +666,8 @@ def create_views_with_rules():
     add_view_rules(chatrel_view, '/api/chatrel/')
 
 
+create_views_with_rules()
+
 if __name__ == "__main__":
-    app.secret_key='WooMessagesKeepsSecrets'
+    app.secret_key='thisissecret'
     app.run(debug=True)

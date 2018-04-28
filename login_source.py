@@ -37,6 +37,7 @@ where all the active chats that the user is in are displayed.
 
 """
 
+import sqlite3
 from database import *
 from Social_Media import *
 from flask import *
@@ -81,12 +82,6 @@ class User(UserMixin):
         return "%d/%s/%s" % (self.id, self.name, self.password)
 
 
-
-
-
-
-
-
 # Register Form Class
 class RegisterForm(Form):
     """
@@ -108,5 +103,6 @@ class RegisterForm(Form):
                                                  message='Incorrect Password')
                               ])
     confirm = PasswordField('Confirm Password')
+
 
 
