@@ -58,7 +58,7 @@ def get_user_by_username(username):
     Returns a dictionary of one user
 
     :param username: the username of the user being searched for
-    :return: a dictinary of the user
+    :return: a dictionary of the user
     """
     # Create cursor
     conn = get_db()
@@ -72,3 +72,93 @@ def get_user_by_username(username):
         return dict(results[0])
     else:
         return None
+
+
+def get_user_id(username):
+    """
+    gets the user_id based off of their unique username
+
+    :param username: the username of the user to get their id
+    :return: the id of the user, or a request error if user doesn't exist
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    query = '''
+        SELECT id FROM user WHERE username = ?
+    '''
+
+    cur.execute(query, (username,))
+
+    id = cur.fetchone()
+
+    if id is None:
+        raise RequestError(422, 'User does not exist')
+    else:
+        return id
+
+
+def get_messages_in_chatroom(chat_id):
+    """
+    Gets all of the messages in a chatroom, ordered by time
+
+    :param chat_id: the id of the chat with the messages
+    :return: an ordered dictionary with the messages.
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    list_of_messages = OrderedDict()
+
+    query = '''
+        SELECT user.name AS "name", message.message AS "message",
+        message.time AS time, chat.title AS "title" FROM user, message, chat
+        WHERE chat.id = ? AND message.chat_id = ? AND user.id = message.user_id
+        ORDER BY time
+    '''
+
+    for row in cur.execute(query, (chat_id, chat_id)):
+        message = row['message']
+
+        if message not in list_of_messages:
+            list_of_messages[message] = []
+
+        list_of_messages[message].append(row)
+
+    return list_of_messages
+
+
+def get_chat_rooms(user_id):
+    """
+    gets all of the chat rooms that a user is in
+
+    :param user_id: the id of the user with which to query to get all of the
+        chat rooms
+    :return: an ordered dictionary containing the chat rooms
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    list_of_rooms = OrderedDict()
+
+    query = '''
+        SELECT chat.title AS "Chat Room", user.name AS "Name"
+        FROM chat, chat_rel, user
+        WHERE chat_rel.user_id = user.id
+        AND chat_rel.chat_id = chat.id
+        AND user.id = ?
+        ORDER BY chat.title, chat.time;
+    '''
+
+    for row in cur.execute(query, (user_id,)):
+        room = row['Chat Room']
+
+        if room not in list_of_rooms:
+            list_of_rooms[room] = []
+
+        list_of_rooms[room].append(row)
+
+    return list_of_rooms
