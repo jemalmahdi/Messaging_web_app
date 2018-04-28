@@ -9,6 +9,7 @@ import os
 import sqlite3
 import csv
 import datetime
+from passlib.hash import sha256_crypt # a hash algorithm that encrypts password
 
 app = Flask(__name__)
 app.config['DATABASE'] = os.path.join(app.root_path, 'WooMessages.sqlite')
@@ -142,13 +143,20 @@ def insert_user(name, email, username, password):
     :param password: user's password
     :return: inserted row as a dictionary
     """
+    # hash and salt password
+    password = sha256_crypt.encrypt(str(password))
+
+
+    # Create cursor
     conn = get_db()
     cur = conn.cursor()
 
+    # Execute query
     cur.execute('INSERT OR IGNORE INTO '
                 'user(name, email, username, password)'
                 'VALUES(?, ?, ?, ?)', (name, email, username, password))
 
+    # Commit to DB
     conn.commit()
 
     cur.execute('SELECT * FROM user WHERE username = ?', (username,))
@@ -221,8 +229,6 @@ def insert_chat_rel(user_id, chat_id):
 
     chat_rel_id = check_chat_rel(user_id, chat_id)
 
-    print(chat_rel_id)
-
     if chat_rel_id is None:
         cur.execute('INSERT INTO '
                     'chat_rel(user_id, chat_id) '
@@ -256,6 +262,7 @@ def insert_table_info(username, password, name, email,
     :param message_time: the content of the message
     :return: None
     """
+
     user = insert_user(name, email, username, password)
     chat = insert_chat(chat_title, message_time)
 
