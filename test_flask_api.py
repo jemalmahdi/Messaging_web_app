@@ -23,8 +23,8 @@ def test_client():
 
 def test_post_user(test_client):
     """
-    Post the message and then check the response for correctness.
-    :param test_client: the flask test_client
+    Post the user and then check the response for correctness.
+    :param test_client: the flask test client
     """
     user = {
         'name': 'TestUser'
@@ -57,6 +57,15 @@ def test_post_user(test_client):
 
     # Check expected values against a GET request
     assert check_values(expected_values, response_json)
+
+
+def test_get_user(test_client):
+    """
+    Get a series of users and checks for correctness.
+    :param test_client: the flask test client
+    """
+
+
 
 
 def check_values(expected_values, response_json):
