@@ -1,7 +1,7 @@
 import requests
 import sys
 
-API_BASE_URL = 'http://127.0.0.1:5000/users'
+API_BASE_URL = 'http://127.0.0.1:5000/api/users'
 
 
 def main():
@@ -26,7 +26,7 @@ def main():
 
     owner_id = content['id']
 
-    response = requests.get('http://127.0.0.1:5000/dog/')
+    response = requests.get('http://127.0.0.1:5000/api/chat/')
 
     if response.status_code != 200:
         sys.exit('Error fetching dogs')

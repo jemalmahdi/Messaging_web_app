@@ -1,7 +1,7 @@
 .mode column
 .headers on
 
-.print sqlite3 Social.sqlite < test_db.sql
+.print sqlite3 WooMessages.sqlite < test_db.sql
 
 .print user all info
 
@@ -12,20 +12,21 @@ FROM user
 ORDER BY user.id;
 
 
-.print user Avi1 info
 
-SELECT * FROM user WHERE user.username = "Avi1";
+.print user AviVajpeyi info
 
+SELECT * FROM user WHERE user.username = "AviVajpeyi";
 
-SELECT chat.name FROM user, chat
-WHERE user.id = chat.user_id
-AND username = "Avi1"
+.print chat info from different users in different chats ordered by time
 
 
---SELECT user.id AS "ID", user.name AS "Name", user.email AS "Email",
---       user.username AS "Username",
---       user.password AS "password"
---FROM track, album, artist
---WHERE track.album_id = album.id
---AND   album.artist_id = artist.id
---ORDER BY track.name;
+.print chat room ordered by time
+
+SELECT user.name AS "Name", chat.title AS "Chat Room",
+ message.message AS "Text", message.time AS "Time"
+FROM user, chat, chat_rel, message
+WHERE chat_rel.user_id = user.id
+AND chat_rel.chat_id = chat.id
+AND message.user_id = user.id
+AND message.chat_id = chat.id
+ORDER BY chat.title, message.time;

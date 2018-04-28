@@ -2,7 +2,7 @@ THINGS TO TEST -*- mode: org -*-
 ^ DO NOT REMOVE THAT ^
 
 * REST API
-** MESSAGE
+** MESSAGE [0/5]
 - [ ] POST Message
   - provide message
   - provide user_id
@@ -16,8 +16,8 @@ THINGS TO TEST -*- mode: org -*-
   - [ ] PATCH message data
   - [ ] PATCH user_id data
 - [ ] DELETE Message
-** USER
-- [ ] POST User
+** USER [1/5]
+- [X] POST User
   - provide user_name
 - [ ] GET User
   - [ ] GET one
@@ -27,7 +27,7 @@ THINGS TO TEST -*- mode: org -*-
 - [ ] PATCH User
   - provide user_name
 - [ ] DELETE User
-** CHAT
+** CHAT [0/3]
 - [ ] POST Chat
   - provide user_id
   - provide text
@@ -35,3 +35,6 @@ THINGS TO TEST -*- mode: org -*-
   - [ ] GET one
   - [ ] GET all
 - [ ] DELETE chat
+
+* Group Meeting
+- 

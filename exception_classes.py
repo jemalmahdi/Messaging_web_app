@@ -1,5 +1,4 @@
-
-
+from flask import jsonify
 
 # START: Taken from homework 18
 class RequestError(Exception):
@@ -19,15 +18,7 @@ class RequestError(Exception):
         return response
 
 
-@app.errorhandler(RequestError)
-def handle_invalid_usage(error):
-    """
-    Returns a JSON response built from RequestError.
 
-    :param error: the RequestError
-    :return: a response containing the error message
-    """
-    return error.to_response()
 
 
 # END: Taken from homework 18

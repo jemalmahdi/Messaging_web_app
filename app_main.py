@@ -4,7 +4,7 @@ CS 232
 Final Project
 
 
-AVI VAJPEYI, JEMAL JEMAL, ISAAC WEISS, MORGAN FREEMAN
+AVI VAJPEYI, JEMAL JEMAL, ISAAC WEISS, MORGAN THOMPSON
 
 This Flask app allows a user to interact with a music artist database in a
 RESTful fashion. Resources can be posted, updated, deleted or queired for.
@@ -399,18 +399,42 @@ import os
 import csv
 import sqlite3
 from collections import OrderedDict
-from custom_views import *
-from database import *
 
 from flask import Flask, g, jsonify, request, \
     render_template, redirect, url_for
 import os
 import click
 
+from flask import *
+from flask.ext.login import LoginManager, UserMixin, \
+                                login_required, login_user, logout_user
+from passlib.hash import sha256_crypt # a hash algorithm that encrypts password
+from wtforms import Form, StringField, TextAreaField, PasswordField, validators
+from functools import wraps
+import os
+
+from login_source import *
+from custom_views import *
+from database import *
+from Social_Media import *
+from exception_classes import *
+from queries import *
+import tabulate
 
 
 app = Flask(__name__)
 app.config['DATABASE'] = os.path.join(app.root_path, 'WooMessages.sqlite')
+app.config["SECRET_KEY"] = 'thisissecret'
+app.config.update(
+    DATABASE=os.path.join(app.root_path, 'WooMessages.sqlite'),
+    DEBUG=True,
+    SECRET_KEY='thisissecret'
+)
+
+# flask-login
+login_manager = LoginManager()  # allows Flask-Login
+login_manager.init_app(app)  # Once app obj created, configures it for login
+login_manager.login_view = "login"
 
 
 @app.cli.command('initdb')
@@ -423,7 +447,18 @@ def initdb_command():
 @click.argument('filename')
 def convert_csv_to_sqlite_command(filename):
     convert_csv_to_sqlite(filename)
-    print('Inserted' + filename+'data into music.sqlite')
+    print('Inserted' + filename)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    """
+    Reloads the USER obj specified by USER ID, stored during one login session.
+
+    :param userid: unicode ID of user
+    :return: corresponding user object
+    """
+    return User.get(user_id)
 
 
 @app.route('/')
@@ -432,6 +467,148 @@ def home_page():
     Serves as a home page
     """
     return render_template('HomePage.html')
+
+
+# User Register
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm(request.form)
+    if request.method == 'POST' and form.validate():
+        # check if there is a post request and if the data inputted to form
+        # is in the correct format (if it has been validated)
+
+        insert_user(name=form.name.data,
+                    email=form.email.data,
+                    username=form.username.data,
+                    password=form.password.data)
+
+
+        # Flash a message to the HTML cause we just registered babbyyyyyy
+        flash('Congratulations! You have sold your soul to WooMessages! Next '
+              'time, read terms and conditions. Proceed to Login.', 'success')
+
+        # now that registered, send to login site
+        return redirect(url_for('login'))
+    return render_template('RegisterationPage.html', form=form) # default GET
+
+
+# User login
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        # Get Form Fields
+        username = request.form['username']
+        password_entered = request.form['password']
+
+        userdata = get_user_by_username(username)
+
+        # if the returned data is for a user
+        if userdata is not None:
+            # Get stored hash
+            password_real = userdata['password']
+
+            # Compare Password entered to password saved in DB
+            if sha256_crypt.verify(password_entered, password_real):
+                # yay! The passwords match
+                session['logged_in'] = True
+                session['username'] = username
+                welcome_text = "Welcome back, " + str(userdata['name'])
+
+                flash(welcome_text, 'success')
+                return redirect(url_for('dashboard'))
+            else:
+                error = 'Invalid password'
+                flash("Invalid password", 'danger')
+                return render_template('Login.html', error=error)
+
+        else:
+            error = 'Username not found'
+            flash("WHO IS U??? Username not found", 'danger')
+            return render_template('login.html', error=error)
+
+    return render_template('Login.html')
+
+
+# Check if user logged in
+def is_logged_in(f):
+    """
+    Code adapted from http://flask.pocoo.org/snippets/98/
+
+    :param f:
+    :return:
+    """
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Unauthorized, Please login', 'danger')
+            return redirect(url_for('login'))
+    return wrap
+
+
+# Logout
+@app.route('/logout')
+@is_logged_in
+def logout():
+    session.clear()
+    flash('Logged out!', 'success')
+    return redirect(url_for('login'))
+
+
+# handle login failed
+@app.errorhandler(401)
+def page_not_found(e):
+    """
+
+    :param e:
+    :return:
+    """
+    return Response('<p>Login failed!</p>')
+
+
+# Dashboard
+@app.route('/dashboard')
+@is_logged_in
+def dashboard():
+    """
+
+
+    :return:
+    """
+    # Create cursor
+    # conn = get_db()
+    # cur = conn.cursor()
+    #
+    # # Get user's active chats
+    # cur.execute('SELECT chat.name FROM user, chat WHERE user.id = chat.user_id AND username = ?', (username,))
+    # data = cur.fetchall()
+    # num_rows = len(data)
+    #
+    # # Get list of active messages from chat rel [FETCHALL]
+    # data = cur.fetchall()
+    # num_rows = len(data)
+
+    data = None
+    num_rows = 0
+
+    if num_rows > 0:
+        return render_template('dashboard.html', active_chats=data)
+    else:
+        msg = 'No active chats'
+        return render_template('dashboard.html', msg=msg)
+    # Close connection
+    cur.close()
+
+@app.errorhandler(RequestError)
+def handle_invalid_usage(error):
+    """
+    Returns a JSON response built from RequestError.
+
+    :param error: the RequestError
+    :return: a response containing the error message
+    """
+    return error.to_response()
 
 
 def add_view_rules(view, view_url):
@@ -452,7 +629,7 @@ def add_view_rules(view, view_url):
                      view_func=view,
                      methods=['GET'])
 
-    app.add_url_rule('/artist/',
+    app.add_url_rule(view_url,
                      view_func=view,
                      methods=['POST'])
 
@@ -468,6 +645,7 @@ def add_view_rules(view, view_url):
                      view_func=view,
                      methods=['PATCH'])
 
+
 def create_views_with_rules():
     """
     Helper function to add rules to the custom views written for the API of
@@ -476,15 +654,20 @@ def create_views_with_rules():
     :return: None
     """
     message_view = MessageView.as_view('message_view')
-    add_view_rules(message_view, 'api/message/')
+    add_view_rules(message_view, '/api/message/')
 
     user_view = UserView.as_view('user_view')
-    add_view_rules(user_view, 'api/user/')
+    add_view_rules(user_view, '/api/user/')
 
     chat_view = ChatView.as_view('chat_view')
-    add_view_rules(chat_view, 'api/chat/')
+    add_view_rules(chat_view, '/api/chat/')
 
     chatrel_view = ChatRelView.as_view('chatrel_view')
-    add_view_rules(chatrel_view, 'api/chatrel/')
+    add_view_rules(chatrel_view, '/api/chatrel/')
 
 
+create_views_with_rules()
+
+if __name__ == "__main__":
+    app.secret_key='thisissecret'
+    app.run(debug=True)
