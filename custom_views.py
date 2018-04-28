@@ -275,9 +275,20 @@ class UserView(MethodView):
         """
         if 'name' not in request.form:
             raise RequestError(422, 'user name required')
+        if 'email' not in request.form:
+            raise RequestError(422, 'user email required')
+        if 'username' not in request.form:
+            raise RequestError(422, 'user username required')
+        if 'password' not in request.form:
+            raise RequestError(422, 'user password required')
+
         else:
-            # THIS IS TEMPORARY, THE ACTUAL VERSION IS COMMENTED OUT
-            response = jsonify(insert_user(request.form['name'], 1))
+            response = jsonify(insert_user(request.form['name'],
+                                           request.form['email'],
+                                           request.form['username'],
+                                           request.form['password']))
+
+            # response = jsonify(insert_user(request.form['name'], 1))
             # response = jsonify(insert_user(request.form['name'], login_id))
             # Need to get login_id
 
