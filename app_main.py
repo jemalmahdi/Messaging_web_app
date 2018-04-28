@@ -477,7 +477,7 @@ def register():
         # check if there is a post request and if the data inputted to form
         # is in the correct format (if it has been validated)
 
-        insert_user(name = form.name.data,
+        insert_user(name=form.name.data,
                     email=form.email.data,
                     username=form.username.data,
                     password=form.password.data)
