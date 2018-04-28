@@ -19,19 +19,19 @@ class ChatRelView(MethodView):
     This view handles all the /chatrel/ requests.
     """
 
-    def get(self, chatrel_id):
+    def get(self, id):
         """
         Handle GET requests.
         Returns JSON representing all of the logins if login_id is None, or a
         single login if login_id is not None.
-        :param chatrel_id: id of a login, or None for all logins
+        :param id: id of a login, or None for all logins
         :return: JSON response
         """
-        if chatrel_id is None:
+        if id is None:
             chatrel = get_all_rows('chat_rel')
             return jsonify(chatrel)
         else:
-            chatrel = query_by_id('chat_rel', chatrel_id)
+            chatrel = query_by_id('chat_rel', id)
 
             if chatrel is not None:
                 response = jsonify(chatrel)
@@ -47,16 +47,14 @@ class ChatRelView(MethodView):
         The username must be provided in the requests's form data.
         :return: a response containing the JSON representation of the login
         """
-        #Still working this one out.
-        if 'username' not in request.form:
-            raise RequestError(422, 'username required')
+        # Still working this one out.
+        if 'user_id' not in request.form:
+            raise RequestError(422, 'user_id required')
+        if 'chat_id' not in request.form:
+            raise RequestError(422, 'chat_id required')
         else:
-            if 'password' not in request.form:
-                raise RequestError(422, 'password required')
-            else:
-                response = jsonify(insert_login(request.form['username'],
-                                                request.form['password']))
-
+            response = jsonify(insert_chat_rel(request.form['user_id'],
+                                               request.form['chat_id']))
         return response
 
     def delete(self, chatrel_id):
