@@ -1,0 +1,19 @@
+<!-- Code adapted from http://flask.pocoo.org/docs/0.12/patterns/flashing/-->
+<!--Section "Flashing with categories"-->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+<!--alert category (danger) makes the flash red-->
+<!--alert category (success) makes the flash green-->
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+{% if error %}
+  <div class="alert alert-danger">{{error}}</div>
+{% endif %}
+
+{% if msg %}
+  <div class="alert alert-success">{{msg}}</div>
+{% endif %}

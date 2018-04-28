@@ -1,0 +1,15 @@
+<!--Function to modify the appearance of the input fields-->
+<!--code obtained from http://flask.pocoo.org/docs/0.12/patterns/wtforms/-->
+{% macro render_field(field) %}
+  {{ field.label }}
+<!--name of field-->
+  {{ field(**kwargs)|safe }}
+<!--not sure of why this is important-->
+
+<!--To display error if there are errors using bootstrap class help-inline-->
+  {% if field.errors %}
+    {% for error in field.errors %}
+      <span class="help-inline">{{ error }}</span>
+    {% endfor %}
+  {% endif %}
+{% endmacro %}

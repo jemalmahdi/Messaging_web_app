@@ -1,0 +1,34 @@
+
+{% extends 'layout.html' %}
+
+{% block body %}
+  <h1>Dashboard <small> Welcome {{session.username}}</small></h1>
+  <a class="btn btn-success" href="/add_chat"> Add Chatroom</a>
+  <hr>
+  <table class="table table-striped">
+    <tr>
+      <th>ID</th>
+      <th>Chat</th>
+      <th>Participants</th>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+    </tr>
+    {% for chat in chats %}
+      <tr>
+        <td>{{chat.id}}</td>
+        <td>{{chat.title}}</td>
+        <td>{{chat.participants}}</td>
+        <td>{{chat.create_date}}</td>
+          <!-- Link to enter chatroom-->
+        <td><a href="chatroom/{{chat.id}}" class="btn btn-default pull-right">Edit</a></td>
+        <td>
+          <form action="{{url_for('delete_chat', id=chat.id)}}" method="post">
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="submit" value="Delete" class="btn btn-danger">
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock %}
