@@ -220,7 +220,7 @@ def insert_chat(title, time):
 
     result = dict(cur.fetchone())
 
-    return dict(result)
+    return result
 
 
 def insert_chat_rel(user_id, chat_id):
