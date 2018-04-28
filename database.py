@@ -378,7 +378,6 @@ def check_chat(title):
         return None # none instead of 0 cause 0 might be a chat id
 
 
-
 def check_chat_rel(user_id, chat_id):
     """
 
