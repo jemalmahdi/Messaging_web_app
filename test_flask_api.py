@@ -23,6 +23,7 @@ def test_client():
     os.unlink(app_main.app.config['DATABASE'])
 
 
+# ---------BEGIN POST TESTS----------
 def test_post_user(test_client):
     """
     Tests the posting of a user for functionality using the post method.
@@ -114,6 +115,29 @@ def test_post_message(test_client):
     post(test_client, data)
 
 
+def test_post_chatrel(test_client):
+    api_path = '/api/chatrel/'
+    chatrel_complete = {
+        'user_id': 1,
+        'chat_id': 1
+    }
+    chatrel_partial = {
+        'user_id': 1
+    }
+    expected_keys = ('id', 'user_id', 'chat_id')
+    expected_values = {
+        'id': 1,
+        'user_id': 1,
+        'chat_id': 1
+    }
+    data = (api_path,
+            chatrel_complete,
+            chatrel_partial,
+            expected_keys,
+            expected_values)
+    post (test_client, data)
+
+
 def post(test_client, data):
     """
     Checks the POST functionality of the API
@@ -194,3 +218,4 @@ def check_keys(expected_keys, response_json):
         if key not in response_json:
             return False
     return True
+# ----------END POST TESTS----------
