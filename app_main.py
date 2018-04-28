@@ -4,7 +4,7 @@ CS 232
 Final Project
 
 
-AVI VAJPEYI, JEMAL JEMAL, ISAAC WEISS, MORGAN FREEMAN
+AVI VAJPEYI, JEMAL JEMAL, ISAAC WEISS, MORGAN THOMPSON
 
 This Flask app allows a user to interact with a music artist database in a
 RESTful fashion. Resources can be posted, updated, deleted or queired for.
@@ -629,7 +629,7 @@ def add_view_rules(view, view_url):
                      view_func=view,
                      methods=['GET'])
 
-    app.add_url_rule('/artist/',
+    app.add_url_rule(view_url,
                      view_func=view,
                      methods=['POST'])
 
