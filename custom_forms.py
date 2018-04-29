@@ -1,3 +1,13 @@
+"""
+WooMessages
+CS 232
+Final Project
+
+
+AVI VAJPEYI, JEMAL JEMAL, ISAAC WEISS, MORGAN THOMPSON
+
+"""
+
 from wtforms import *
 
 
