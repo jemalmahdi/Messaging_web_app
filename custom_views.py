@@ -205,7 +205,8 @@ class MessageView(MethodView):
                 message = query_by_id('message', id)
 
                 if message is not None:
-                    update_message()
+                    update_message(request.form['message'],
+                                   request.form['user_id'], id)
                 else:
                     raise RequestError(404, 'message not found')
 
@@ -422,6 +423,29 @@ class ChatView(MethodView):
             else:
                 raise RequestError(404, 'chat not found')
         return jsonify(chat)
+
+    def put(self, id):
+        """
+        Handles a PUT request given a certain chat_id
+        :param id: the id of the chat
+        :return:a response containing the JSON representation of the
+            new chat
+        """
+
+        if id is None:
+            raise RequestError(422, 'Chat Id is required')
+        else:
+            if 'title' not in request.form:
+                raise RequestError(422, 'Chat title is required')
+            else:
+                chat = query_by_id('chat', id)
+
+                if chat is not None:
+                    update_chat(id, request.form['title'])
+                else:
+                    raise RequestError(404, 'chat not found')
+                user = query_by_id('chat', id)
+                return jsonify(user)
 
 
 # Register MessageView as the handler for all the /message/ requests.
