@@ -619,12 +619,12 @@ def chat_room(id):
 
         data = get_messages_in_chatroom(id)
 
-
         return render_template('chat_room.html', names=participant_str,
                                room=room_data, chat_room=data, form=form)
 
     return render_template('chat_room.html', names=participant_str,
                            room=room_data, chat_room=data, form=form)
+
 
 # Add chat room
 @app.route('/add_chat', methods=['GET', 'POST'])

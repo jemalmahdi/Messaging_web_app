@@ -13,7 +13,6 @@ from exception_classes import *
 from database import *
 
 
-
 class ChatRelView(MethodView):
     """
     This view handles all the /chatrel/ requests.
@@ -93,7 +92,7 @@ class ChatRelView(MethodView):
                 chat = query_by_id('chat_rel', id)
 
                 if chat is not None:
-                    #Need new function
+                    # Need new function
                     update_user(id, request.form['user_id'])
                 else:
                     raise RequestError(404, 'chat not found')
@@ -117,7 +116,7 @@ class ChatRelView(MethodView):
                 chat = query_by_id('chat_rel', chatrel_id)
 
                 if chat is not None:
-                    #Need new function
+                    # Need new function
                     update_user(chatrel_id, request.form['user_id'])
                 else:
                     raise RequestError(404, 'chat not found')
@@ -401,7 +400,7 @@ class ChatView(MethodView):
         else:
             response = jsonify(insert_chat(request.form['title'],
                                            request.form['time']))
-            #FIND SOMETHING THAT WORKS HERE
+            # FIND SOMETHING THAT WORKS HERE
             # response = jsonify(insert_message(request.form['text'], user_id))
         return response
 
@@ -423,3 +422,67 @@ class ChatView(MethodView):
             else:
                 raise RequestError(404, 'chat not found')
         return jsonify(chat)
+
+
+# Register MessageView as the handler for all the /message/ requests.
+message_view = MessageView.as_view('message_view')
+app.add_url_rule('/api/message/', defaults={'message_id': None},
+                 view_func=message_view, methods=['GET'])
+app.add_url_rule('/api/message/', view_func=message_view,
+                 methods=['POST'])
+# For this you would need to provide the user_id through the form data. URL
+# values are only for message ID -Morgan
+# app.add_url_rule('/message/<int:user_id>', view_func=message_view,
+#                  methods=['POST'])  # Hey, should this be message? or POST
+app.add_url_rule('/api/message/<int:message_id>', view_func=message_view,
+                 methods=['GET'])
+app.add_url_rule('/api/message/<int:message_id>', view_func=message_view,
+                 methods=['DELETE'])
+app.add_url_rule('/api/message/<int:message_id>', view_func=message_view,
+                 methods=['PUT'])
+app.add_url_rule('/api/message/<int:message_id>', view_func=message_view,
+                 methods=['PATCH'])
+
+
+# Register UserView as the handler for all the /user/ requests.
+user_view = UserView.as_view('user_view')
+app.add_url_rule('/api/user/', defaults={'user_id': None},
+                 view_func=user_view, methods=['GET'])
+app.add_url_rule('/api/user', view_func=user_view,
+                 methods=['POST'])
+app.add_url_rule('/api/user/<int:user_id>', view_func=user_view,
+                 methods=['GET'])
+app.add_url_rule('/api/user/<int:user_id>', view_func=user_view,
+                 methods=['DELETE'])
+app.add_url_rule('/api/user/<int:user_id>', view_func=user_view,
+                 methods=['PUT'])
+app.add_url_rule('/api/user/<int:user_id>', view_func=user_view,
+                 methods=['PATCH'])
+
+
+# Register ChatView as the handler for all the /chat/ requests.
+chat_view = ChatView.as_view('chat_view')
+app.add_url_rule('/api/chat/', defaults={'chat_id': None},
+                 view_func=chat_view, methods=['GET'])
+app.add_url_rule('/api/chat/', view_func=chat_view,
+                 methods=['POST'])
+app.add_url_rule('/api/chat/<int:user_id>', view_func=chat_view,
+                 methods=['GET'])
+app.add_url_rule('/api/chat/<int:chat_id>', view_func=chat_view,
+                 methods=['DELETE'])
+
+
+# Register ChatRelView as the handler for all the /login/ requests.
+chatrel_view = ChatRelView.as_view('chatrel_view')
+app.add_url_rule('/chatrel/', defaults={'chatrel_id': None},
+                 view_func=chatrel_view, methods=['GET'])
+app.add_url_rule('/chatrel/', view_func=chatrel_view,
+                 methods=['POST'])
+app.add_url_rule('/chatrel/<int:chatrel_id>', view_func=chatrel_view,
+                 methods=['GET'])
+app.add_url_rule('/chatrel/<int:chatrel_id>', view_func=chatrel_view,
+                 methods=['DELETE'])
+app.add_url_rule('/chatrel/<int:chatrel_id>', view_func=chatrel_view,
+                 methods=['PUT'])
+app.add_url_rule('/chatrel/<int:chatrel_id>', view_func=chatrel_view,
+                 methods=['PATCH'])
