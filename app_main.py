@@ -448,7 +448,7 @@ def initdb_command():
 @click.argument('filename')
 def convert_csv_to_sqlite_command(filename):
     convert_csv_to_sqlite(filename)
-    print('Inserted' + filename)
+    print('Inserted ' + filename)
 
 
 @login_manager.user_loader
@@ -577,20 +577,10 @@ def dashboard():
 
     :return:
     """
-    # Create cursor
-    # conn = get_db()
-    # cur = conn.cursor()
-    #
-    # # Get user's active chats
-    # cur.execute('SELECT chat.name FROM user, chat WHERE user.id = chat.user_id AND username = ?', (username,))
-    # data = cur.fetchall()
-    # num_rows = len(data)
-    #
-    # # Get list of active messages from chat rel [FETCHALL]
-    # data = cur.fetchall()
-    # num_rows = len(data)
 
-    data = get_chat_rooms(1)
+    data =  get_chat_rooms(get_user_id(session['username']))
+
+    # data = get_chat_rooms(get_user_id(session['username']))
 
     num_rows = 0
     if data is not None:
@@ -607,27 +597,28 @@ def dashboard():
 
 ##############################################################################
 
-# Chats
-@app.route('/chat_rooms')
-def chat_rooms():
-
-    result = get_chat_rooms()  # chat titles, participants, creation times
-
-    if result is not None:
-        return render_template('chat_rooms.html', chat_rooms=result)
-    else:
-        msg = 'No Articles Found'
-        return render_template('chat_rooms.html', msg=msg)
-
 
 #Single chat room
-@app.route('/chat_room/<string:id>/')
+@app.route('/chat_room/<string:id>/', methods=['GET', 'POST'])
 def chat_room(id):
-    # SQL SHIT TO GET MESSAGES
     data = get_messages_in_chatroom(id)
+    room_data = get_room_info(id)
 
-    # at the bottom of the page we need a post
-    return render_template('chat_room.html', chat_room=data)
+    print("Chat room=", id)
+
+    print("before posting")
+    form = MessageForm(request.form)
+    if request.method == 'POST' and form.validate():
+        insert_message(message=form.message.data,
+                       time=get_date(),
+                       user_id=get_user_id(session['username']),
+                       chat_id=id)
+
+        data = get_messages_in_chatroom(id)
+
+        return render_template('chat_room.html', room=room_data, chat_room=data, form=form)
+   
+    return render_template('chat_room.html', room=room_data, chat_room=data, form=form)
 
 
 
@@ -638,11 +629,12 @@ def add_chat():
     form = ChatRoomForm(request.form)
     if request.method == 'POST' and form.validate():
         title = form.title.data
-        body = form.body.data
+        participants = form.participants.data
+        participant_list = participants.split(",")
 
-        ## SQL SHIT TO INSERT CHAT ROOM AND PARTICIPANTS
+        insert_chat_room(title, participant_list):
 
-        flash('Article Created', 'success')
+        flash('Chat room Created', 'success')
 
         return redirect(url_for('dashboard'))
 
@@ -653,9 +645,10 @@ def add_chat():
 @app.route('/delete_chat/<string:id>', methods=['POST'])
 @is_logged_in
 def delete_chat(id):
-    ## SQL shit to delete chat
 
-    flash('Article Deleted', 'success')
+    delete_user_from_chat(session['username'], id)
+
+    flash('You have left the chat', 'success')
 
     return redirect(url_for('dashboard'))
 

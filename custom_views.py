@@ -76,7 +76,7 @@ class ChatRelView(MethodView):
                 raise RequestError(404, 'Chat rel not found')
         return jsonify(chat)
 
-    def put(self, chatrel_id):
+    def put(self, id):
         """
         Handles a PUT request given a certain login_id
         :param login_id: the id of the login to be put
@@ -84,20 +84,20 @@ class ChatRelView(MethodView):
             new login
         """
 
-        if chatrel_id is None:
+        if id is None:
             raise RequestError(422, 'chatrel_id is required')
         else:
             if 'user_id' not in request.form:
                 raise RequestError(422, 'User_id is required')
             else:
-                chat = query_by_id('chat_rel', chatrel_id)
+                chat = query_by_id('chat_rel', id)
 
                 if chat is not None:
                     #Need new function
-                    update_user(chatrel_id, request.form['user_id'])
+                    update_user(id, request.form['user_id'])
                 else:
                     raise RequestError(404, 'chat not found')
-                chat = query_by_id('chat_rel', chatrel_id)
+                chat = query_by_id('chat_rel', id)
                 return jsonify(chat)
 
     def patch(self, chatrel_id):
@@ -189,29 +189,28 @@ class MessageView(MethodView):
                 raise RequestError(404, 'message not found')
         return jsonify(messages)
 
-    def put(self, message_id):
+    def put(self, id):
         """
         Handles a PUT request given a certain message_id
-        :param message_id: the id of the message to be put
+        :param id: the id of the message to be put
         :return:a response containing the JSON representation of the
             new message
         """
 
-        if message_id is None:
+        if id is None:
             raise RequestError(422, 'message id is required')
         else:
-            if 'text' not in request.form:
+            if 'message' not in request.form:
                 raise RequestError(422, 'message text is required')
             else:
-                message = query_by_id('message', message_id)
+                message = query_by_id('message', id)
 
                 if message is not None:
-                    update_message(request.form['text'],
-                                  request.form['user'], message_id)
+                    update_message()
                 else:
                     raise RequestError(404, 'message not found')
 
-                message = query_by_id('message', message_id)
+                message = query_by_id('message', id)
                 return jsonify(message)
 
     def patch(self, message_id):
@@ -254,7 +253,7 @@ class UserView(MethodView):
         Handle GET requests.
         Returns JSON representing all of the users if user_id is None, or a
         single user if user_id is not None.
-        :param user_id: id of a user, or None for all users
+        :param id: id of a user, or None for all users
         :return: JSON response
         """
         if id is None:
@@ -262,7 +261,6 @@ class UserView(MethodView):
             return jsonify(user)
         else:
             user = query_by_id('user', id)
-
             if user is not None:
                 response = jsonify(user)
             else:
@@ -317,7 +315,7 @@ class UserView(MethodView):
                 raise RequestError(404, 'user not found')
         return jsonify(user)
 
-    def put(self, user_id):
+    def put(self, id):
         """
         Handles a PUT request given a certain user_id
         :param user_id: the id of the user to be put
@@ -325,19 +323,19 @@ class UserView(MethodView):
             new user
         """
 
-        if user_id is None:
+        if id is None:
             raise RequestError(422, 'User Id is required')
         else:
             if 'name' not in request.form:
                 raise RequestError(422, 'User name is required')
             else:
-                user = query_by_id('user', user_id)
+                user = query_by_id('user', id)
 
                 if user is not None:
-                    update_user(user_id, request.form['name'])
+                    update_user(id, request.form['name'])
                 else:
                     raise RequestError(404, 'user not found')
-                user = query_by_id('user', user_id)
+                user = query_by_id('user', id)
                 return jsonify(user)
 
     def patch(self, user_id):
