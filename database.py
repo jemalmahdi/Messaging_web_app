@@ -9,7 +9,9 @@ import os
 import sqlite3
 import csv
 import datetime
-from passlib.hash import sha256_crypt # a hash algorithm that encrypts password
+# a hash algorithm that encrypts password
+from passlib.hash import sha256_crypt
+
 
 app = Flask(__name__)
 app.config['DATABASE'] = os.path.join(app.root_path, 'WooMessages.sqlite')
@@ -85,7 +87,6 @@ def convert_csv_to_sqlite(filename):
                           )
 
 
-
 def csv_row_generator(filename):
     """
     Helper function to read row line of the CSV
@@ -129,7 +130,7 @@ def get_date():
     """
     now = datetime.datetime.now()
 
-    return now.strftime("%Y-%m-%d %H:%M")
+    return now.strftime("%m/%d/%Y %H:%M")
 
 
 def insert_user(name, email, username, password):
@@ -143,9 +144,9 @@ def insert_user(name, email, username, password):
     :param password: user's password
     :return: inserted row as a dictionary
     """
+
     # hash and salt password
     password = sha256_crypt.encrypt(str(password))
-
 
     # Create cursor
     conn = get_db()
@@ -294,7 +295,6 @@ def insert_table_info(username, password, name, email,
     # insert_chat_rel(user_id, chat_id)
 
 
-
 def update_message(text, user_id, message_id):
     conn = get_db()
     cur = conn.cursor()
@@ -366,7 +366,7 @@ def check_chat(title):
     cur = conn.cursor()
 
     query = '''
-        SELECT * FROM chat WHERE title = ?
+    SELECT * FROM chat WHERE title = ?
     '''
 
     cur.execute(query, (title,))
@@ -375,7 +375,7 @@ def check_chat(title):
     if content is not None:
         return content['id']
     else:
-        return None # none instead of 0 cause 0 might be a chat id
+        return None  # none instead of 0 cause 0 might be a chat id
 
 
 def check_chat_rel(user_id, chat_id):
@@ -392,6 +392,7 @@ def check_chat_rel(user_id, chat_id):
         AND chat_id = ?;
     '''
 
+    # print("UID:{}, CID:{}".format(user_id, chat_id))
     cur.execute(query, (user_id, chat_id))
 
     content = cur.fetchone()
@@ -400,3 +401,6 @@ def check_chat_rel(user_id, chat_id):
         return content['id']
     else:
         return None  # none instead of 0 cause 0 might be a chat id
+
+
+

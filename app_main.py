@@ -408,7 +408,8 @@ import click
 from flask import *
 from flask.ext.login import LoginManager, UserMixin, \
                                 login_required, login_user, logout_user
-from passlib.hash import sha256_crypt # a hash algorithm that encrypts password
+# a hash algorithm that encrypts password
+from passlib.hash import sha256_crypt
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from functools import wraps
 import os
@@ -483,14 +484,13 @@ def register():
                     username=form.username.data,
                     password=form.password.data)
 
-
         # Flash a message to the HTML cause we just registered babbyyyyyy
         flash('Congratulations! You have sold your soul to WooMessages! Next '
               'time, read terms and conditions. Proceed to Login.', 'success')
 
         # now that registered, send to login site
         return redirect(url_for('login'))
-    return render_template('RegisterationPage.html', form=form) # default GET
+    return render_template('RegisterationPage.html', form=form)  # default GET
 
 
 # User login
@@ -578,9 +578,7 @@ def dashboard():
     :return:
     """
 
-    print (session['username'])
-    print (get_user_id(session['username']))
-    data =  get_chat_rooms(get_user_id(session['username']))
+    data = get_chat_rooms(get_user_id(session['username']))
 
     # data = get_chat_rooms(get_user_id(session['username']))
 
@@ -600,26 +598,33 @@ def dashboard():
 ##############################################################################
 
 
-#Single chat room
-@app.route('/chat_room/<string:id>/')
+# Single chat room
+@app.route('/chat_room/<string:id>/', methods=['GET', 'POST'])
 def chat_room(id):
     data = get_messages_in_chatroom(id)
     room_data = get_room_info(id)
+    participant_list = get_participants_in_chat(id)
+    participant_str = ", ".join(
+        str(participant) for participant in participant_list)
 
+    print("Chat room=", id)
+
+    print("before posting")
     form = MessageForm(request.form)
     if request.method == 'POST' and form.validate():
-
         insert_message(message=form.message.data,
                        time=get_date(),
                        user_id=get_user_id(session['username']),
-                       chat_id=id
-                       )
+                       chat_id=id)
 
-        return render_template('chat_room.html', room=room_data, chat_room=data, form=form)
-   
-    return render_template('chat_room.html', room=room_data, chat_room=data, form=form)
+        data = get_messages_in_chatroom(id)
 
 
+        return render_template('chat_room.html', names=participant_str,
+                               room=room_data, chat_room=data, form=form)
+
+    return render_template('chat_room.html', names=participant_str,
+                           room=room_data, chat_room=data, form=form)
 
 # Add chat room
 @app.route('/add_chat', methods=['GET', 'POST'])
@@ -628,11 +633,16 @@ def add_chat():
     form = ChatRoomForm(request.form)
     if request.method == 'POST' and form.validate():
         title = form.title.data
-        body = form.body.data
+        participants = form.participants.data
+        participant_list = participants.split(",")
+        participant_list[:] = [p.replace(' ', '') for p in participant_list]
 
-        ## SQL SHIT TO INSERT CHAT ROOM AND PARTICIPANTS
+        # user creating the chat must be in the chat
+        participant_list.append(session['username'])
 
-        flash('Chat room Created', 'success')
+        insert_chat_room(title, participant_list)
+
+        flash('Chat room created', 'success')
 
         return redirect(url_for('dashboard'))
 
@@ -643,9 +653,12 @@ def add_chat():
 @app.route('/delete_chat/<string:id>', methods=['POST'])
 @is_logged_in
 def delete_chat(id):
-    ## SQL shit to delete chat
 
-    flash('Article Deleted', 'success')
+    delete_user_from_chat(session['username'], id)
+
+    chat_name = get_chat_room_name(id)
+
+    flash('You have left the chat \"{}\"'.format(chat_name), 'success')
 
     return redirect(url_for('dashboard'))
 
@@ -721,5 +734,5 @@ def create_views_with_rules():
 create_views_with_rules()
 
 if __name__ == "__main__":
-    app.secret_key='thisissecret'
+    app.secret_key = 'thisissecret'
     app.run(debug=True)

@@ -17,6 +17,12 @@
         <td>{{date}}</td>
           <!-- Link to enter chatroom-->
         <td><a href="chat_room/{{id}}" class="btn btn-default pull-right">Enter Room</a></td>
+        <td>
+          <form action="{{url_for('delete_chat', id=id)}}" method="post">
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="submit" value="Leave" class="btn btn-danger">
+          </form>
+        </td>
       </tr>
     {% endfor %}
   </table>

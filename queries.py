@@ -69,11 +69,12 @@ def get_user_by_username(username):
     cur.execute('SELECT * FROM user WHERE username = ?', (username,))
     results = cur.fetchall()
 
-    if len(results) == 1:
+    if len(results) > 0:
+        print("get_user_by_username(username)")
+        print(results[0]['username'])
         return dict(results[0])
     else:
         return None
-
 
 def get_user_id(username):
     """
@@ -122,19 +123,47 @@ def get_messages_in_chatroom(chat_id):
     '''
 
     for row in cur.execute(query, (chat_id, chat_id)):
-        # create_date = row['created']
-        # title = row['title']
+
         message = row['message']
         name = row['name']
         time = row['time']
 
-
         if message not in list_of_messages:
-            list_of_messages[ name, message, time] = []
+            list_of_messages[name, message, time] = []
 
-        list_of_messages[ name, message, time].append(row)
+        list_of_messages[name, message, time].append(row)
 
     return list_of_messages
+
+
+
+def get_chat_room_name(chat_id):
+    """
+    A function that finds the name of a chat room given a specific id
+
+    :param chat_id: the id of a chat
+    :return: 
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    query = '''
+        SELECT chat.title AS "chat_title"
+        FROM chat
+        WHERE chat.id = ?
+    '''
+
+    cur.execute(query, (chat_id,))
+
+    result = cur.fetchone()[0]
+
+    if result is None:
+        raise RequestError(422, 'chat does not exist')
+    else:
+        return result
+
+    return room_data
 
 
 def get_chat_rooms(user_id):
@@ -174,6 +203,36 @@ def get_chat_rooms(user_id):
     return room_data
 
 
+def get_participants_in_chat(chat_id):
+    """
+    A function that will return an ordered dictionary of participants in a chat
+
+    :param chat_id: the id of the chat to find participants in
+    :return: an ordered dictionary of participants
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    participant_data = OrderedDict()
+
+    query = '''
+        SELECT user.name AS "name" FROM user, chat_rel
+        WHERE user.id = chat_rel.user_id AND chat_rel.chat_id = ?
+        ORDER BY name
+    '''
+
+    for row in cur.execute(query, (chat_id,)):
+        participant = row['name']
+
+        if participant not in participant_data:
+            participant_data[participant] = []
+
+        participant_data[participant].append(row)
+
+    return participant_data
+
+
 def get_room_info(chatroom_id):
     """
     Will get the title and time of creation for a chatroom based off of an id
@@ -204,6 +263,25 @@ def get_room_info(chatroom_id):
     return room_data
 
 
+def delete_user_from_chat(username, chat_id):
+    """
+    This function removes a user from a chat. If there are no users in a chat,
+    the chat will also be deleted.
+
+    :param username: the username of the user to be deleted
+    :param chat_id: that chat id from which to delete a user
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    user_id = get_user_id(username)
+
+    cur.execute('DELETE FROM chat_rel WHERE user_id = ? AND chat_id = ?',
+                (user_id, chat_id))
+    conn.commit()
+
+
 def insert_chat_room(title, username_list):
     """
     will take information from the HTML to create a new chatroom
@@ -213,13 +291,14 @@ def insert_chat_room(title, username_list):
     :return: null
     """
 
-    chat_id = insert_chat(title, get_date())
+    print("entered inert chat room")
+
+    chat = insert_chat(title, get_date())
 
     for username in username_list:
-        if get_user_by_username(username):
-            raise RequestError(422, 'username does not exist')
-        else:
-            insert_chat_rel(chat_id, get_user_id(username))
+        search_result = get_user_by_username(username)
+        if search_result is not None:
+            insert_chat_rel(get_user_id(username), chat['id'])
 
 
 def delete_user_from_chat(username, chat_id):
