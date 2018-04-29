@@ -223,6 +223,9 @@ def insert_chat(title, time):
     return result
 
 
+
+
+
 def insert_chat_rel(user_id, chat_id):
     conn = get_db()
     cur = conn.cursor()

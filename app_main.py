@@ -629,9 +629,10 @@ def add_chat():
     form = ChatRoomForm(request.form)
     if request.method == 'POST' and form.validate():
         title = form.title.data
-        body = form.body.data
+        participants = form.participants.data
+        participant_list = participants.split(",")
 
-        ## SQL SHIT TO INSERT CHAT ROOM AND PARTICIPANTS
+        insert_chat_room(title, participant_list):
 
         flash('Chat room Created', 'success')
 
