@@ -604,12 +604,9 @@ def chat_room(id):
     data = get_messages_in_chatroom(id)
     room_data = get_room_info(id)
     participant_list = get_participants_in_chat(id)
-    participant_str = ", ".join(
-        str(participant) for participant in participant_list)
+    participant_str = ", ".join(str(participant) for
+                                participant in participant_list)
 
-    print("Chat room=", id)
-
-    print("before posting")
     form = MessageForm(request.form)
     if request.method == 'POST' and form.validate():
         insert_message(message=form.message.data,
@@ -640,9 +637,17 @@ def add_chat():
         # user creating the chat must be in the chat
         participant_list.append(session['username'])
 
-        insert_chat_room(title, participant_list)
+        result = insert_chat_room(title, participant_list)
 
-        flash('Chat room created', 'success')
+        if result.isdigit():
+            flash('Chat room \"{}\" created!'.format(get_chat_room_name(id)),
+                  'success')
+            return redirect(url_for('dashboard'))
+        else:
+            flash('User \"{}\" does not exist. '
+                  'Could not create chat.'.format(str(result)),
+                  'danger')
+            return redirect(url_for('add_chat'))
 
         return redirect(url_for('dashboard'))
 

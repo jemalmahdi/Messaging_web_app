@@ -34,7 +34,7 @@ class ChatRoomForm(Form):
     title = StringField('Name',
                         [validators.Length(min=1, max=50)])
     participants = StringField('Participants',
-                               [validators.Length(min=4, max=25)])
+                               [validators.Length(min=4, max=250)])
 
 
 

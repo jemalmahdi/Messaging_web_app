@@ -74,7 +74,7 @@ def get_user_by_username(username):
         print(results[0]['username'])
         return dict(results[0])
     else:
-        return None
+        return None # if none flash red
 
 
 def get_user_id(username):
@@ -289,14 +289,22 @@ def insert_chat_room(title, username_list):
     :return: null
     """
 
-    print("entered inert chat room")
-
-    chat = insert_chat(title, get_date())
-
+    # check if all users are valid users
+    verified_user  = []
     for username in username_list:
         search_result = get_user_by_username(username)
         if search_result is not None:
-            insert_chat_rel(get_user_id(username), chat['id'])
+            verified_user.append(username)
+        else:
+            return username  # return invalid username
+
+    # since valid users, add chat and add users to chat
+    chat = insert_chat(title, get_date())
+    chat_id = chat['id']
+    for username in verified_user:
+        insert_chat_rel(get_user_id(username), chat_id)
+
+    return chat_id  # no error!
 
 
 def delete_user_from_chat(username, chat_id):
