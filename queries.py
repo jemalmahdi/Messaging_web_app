@@ -128,11 +128,10 @@ def get_messages_in_chatroom(chat_id):
         name = row['name']
         time = row['time']
 
-
         if message not in list_of_messages:
-            list_of_messages[ name, message, time] = []
+            list_of_messages[name, message, time] = []
 
-        list_of_messages[ name, message, time].append(row)
+        list_of_messages[name, message, time].append(row)
 
     return list_of_messages
 
