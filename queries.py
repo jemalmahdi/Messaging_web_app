@@ -114,18 +114,21 @@ def get_messages_in_chatroom(chat_id):
 
     query = '''
         SELECT user.name AS "name", message.message AS "message",
-        message.time AS time, chat.title AS "title" FROM user, message, chat
+        message.time AS "time", chat.title AS "title" FROM user, message, chat
         WHERE chat.id = ? AND message.chat_id = ? AND user.id = message.user_id
         ORDER BY time
     '''
 
     for row in cur.execute(query, (chat_id, chat_id)):
         message = row['message']
+        name = row['name']
+        time = row['time']
+
 
         if message not in list_of_messages:
-            list_of_messages[message] = []
+            list_of_messages[name, message, time] = []
 
-        list_of_messages[message].append(row)
+        list_of_messages[name, message, time].append(row)
 
     return list_of_messages
 
