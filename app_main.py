@@ -632,7 +632,7 @@ def add_chat():
         participants = form.participants.data
         participant_list = participants.split(",")
 
-        insert_chat_room(title, participant_list):
+        insert_chat_room(title, participant_list)
 
         flash('Chat room Created', 'success')
 
