@@ -621,7 +621,6 @@ def chat_room(id):
     return render_template('chat_room.html', room=room_data, chat_room=data, form=form)
 
 
-
 # Add chat room
 @app.route('/add_chat', methods=['GET', 'POST'])
 @is_logged_in
@@ -631,10 +630,14 @@ def add_chat():
         title = form.title.data
         participants = form.participants.data
         participant_list = participants.split(",")
+        participant_list[:] = [p.replace(' ', '') for p in participant_list]
 
-        insert_chat_room(title, participant_list):
+        # user creating the chat must be in the chat
+        participant_list.append(session['username'])
 
-        flash('Chat room Created', 'success')
+        insert_chat_room(title, participant_list)
+
+        flash('Chat room created', 'success')
 
         return redirect(url_for('dashboard'))
 
@@ -648,7 +651,9 @@ def delete_chat(id):
 
     delete_user_from_chat(session['username'], id)
 
-    flash('You have left the chat', 'success')
+    chat_name = get_chat_room_name(id)
+
+    flash('You have left the chat {}'.format(chat_name), 'success')
 
     return redirect(url_for('dashboard'))
 
