@@ -1,8 +1,10 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-  <h1>{{chat_room.title}}</h1>
-  <small>Created on {{chat_room.create_date}}</small>
+  {% for title, date in room %}
+    <h1>{{title}}</h1>
+    <small>Created on {{date}}</small>
+  {% endfor %}
   <hr>
   <div>
     <table class="table table-striped">

@@ -448,7 +448,7 @@ def initdb_command():
 @click.argument('filename')
 def convert_csv_to_sqlite_command(filename):
     convert_csv_to_sqlite(filename)
-    print('Inserted' + filename)
+    print('Inserted ' + filename)
 
 
 @login_manager.user_loader
@@ -608,27 +608,14 @@ def dashboard():
 ##############################################################################
 
 # Chats
-@app.route('/chat_rooms')
-def chat_rooms():
-
-    result = get_chat_rooms()  # chat titles, participants, creation times
-
-    if result is not None:
-        return render_template('chat_rooms.html', chat_rooms=result)
-    else:
-        msg = 'No Articles Found'
-        return render_template('chat_rooms.html', msg=msg)
-
-
 #Single chat room
 @app.route('/chat_room/<string:id>/')
 def chat_room(id):
     # SQL SHIT TO GET MESSAGES
     data = get_messages_in_chatroom(id)
-
+    room_data = get_room_info(id)
     # at the bottom of the page we need a post
-    return render_template('chat_room.html', chat_room=data)
-
+    return render_template('chat_room.html', room=room_data, chat_room=data)
 
 
 # Add chat room
