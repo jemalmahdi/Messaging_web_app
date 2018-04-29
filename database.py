@@ -334,6 +334,29 @@ def update_user(user_id, name):
     return dict(cur.fetchone())
 
 
+def update_chat(chat_id, title):
+    """
+    Will update a chat title given a specific chat_id
+    :param chat_id: the id of the chat to be updated
+    :param title: the updated chat title
+    :return: a dictionary representing the new, updated chat title
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    query = '''
+        UPDATE chat SET title = ? WHERE id = ?
+    '''
+
+    cur.execute(query, (title, chat_id))
+    conn.commit()
+
+    cur.execute('SELECT * FROM chat WHERE id = ?', (chat_id,))
+
+    return dict(cur.fetchone())
+
+
 def delete_item(table_name, item_id):
     """
     This function deletes items with item_id from table_name
@@ -401,6 +424,3 @@ def check_chat_rel(user_id, chat_id):
         return content['id']
     else:
         return None  # none instead of 0 cause 0 might be a chat id
-
-
-

@@ -74,7 +74,8 @@ def get_user_by_username(username):
         print(results[0]['username'])
         return dict(results[0])
     else:
-        return None
+        return None # if none flash red
+
 
 def get_user_id(username):
     """
@@ -136,13 +137,12 @@ def get_messages_in_chatroom(chat_id):
     return list_of_messages
 
 
-
 def get_chat_room_name(chat_id):
     """
     A function that finds the name of a chat room given a specific id
 
     :param chat_id: the id of a chat
-    :return: 
+    :return: the name of the chatroom
     """
 
     conn = get_db()
@@ -162,8 +162,6 @@ def get_chat_room_name(chat_id):
         raise RequestError(422, 'chat does not exist')
     else:
         return result
-
-    return room_data
 
 
 def get_chat_rooms(user_id):
@@ -291,20 +289,31 @@ def insert_chat_room(title, username_list):
     :return: null
     """
 
-    print("entered inert chat room")
-
-    chat = insert_chat(title, get_date())
-
+    # check if all users are valid users
+    verified_user  = []
     for username in username_list:
         search_result = get_user_by_username(username)
         if search_result is not None:
-            insert_chat_rel(get_user_id(username), chat['id'])
+            verified_user.append(username)
+        else:
+            return username  # return invalid username
+
+    # since valid users, add chat and add users to chat
+    chat = insert_chat(title, get_date())
+    chat_id = chat['id']
+    for username in verified_user:
+        insert_chat_rel(get_user_id(username), chat_id)
+
+    return chat_id  # no error!
 
 
 def delete_user_from_chat(username, chat_id):
     """
     This function removes a user from a chat. If there are no users in a chat,
     the chat will also be deleted.
+
+    :param username: the username of the user to be deleted
+    :param chat_id: the id of the chat
     """
 
     conn = get_db()
