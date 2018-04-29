@@ -578,7 +578,11 @@ def dashboard():
     :return:
     """
 
-    data = get_chat_rooms(get_user_id(session['username']))
+    print (session['username'])
+    print (get_user_id(session['username']))
+    data =  get_chat_rooms(get_user_id(session['username']))
+
+    # data = get_chat_rooms(get_user_id(session['username']))
 
     num_rows = 0
     if data is not None:

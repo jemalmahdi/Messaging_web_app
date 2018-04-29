@@ -2,7 +2,8 @@
 A file containing functions for quering the WooMessages database.
 """
 
-from database import get_db
+from database import *
+from exception_classes import *
 from collections import OrderedDict
 
 
@@ -91,7 +92,7 @@ def get_user_id(username):
 
     cur.execute(query, (username,))
 
-    user_id = cur.fetchone()
+    user_id = cur.fetchone()[0]
 
     if user_id is None:
         raise RequestError(422, 'User does not exist')
@@ -219,3 +220,19 @@ def insert_chat_room(title, username_list):
             raise RequestError(422, 'username does not exist')
         else:
             insert_chat_rel(chat_id, get_user_id(username))
+
+
+def delete_user_from_chat(username, chat_id):
+    """
+    This function removes a user from a chat. If there are no users in a chat,
+    the chat will also be deleted.
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    user_id = get_user_id(username)
+
+    cur.execute('DELETE FROM chat_rel WHERE user_id = ? AND chat_id = ?',
+                (user_id, chat_id))
+    conn.commit()
