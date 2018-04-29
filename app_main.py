@@ -448,7 +448,7 @@ def initdb_command():
 @click.argument('filename')
 def convert_csv_to_sqlite_command(filename):
     convert_csv_to_sqlite(filename)
-    print('Inserted' + filename)
+    print('Inserted ' + filename)
 
 
 @login_manager.user_loader
@@ -577,20 +577,12 @@ def dashboard():
 
     :return:
     """
-    # Create cursor
-    # conn = get_db()
-    # cur = conn.cursor()
-    #
-    # # Get user's active chats
-    # cur.execute('SELECT chat.name FROM user, chat WHERE user.id = chat.user_id AND username = ?', (username,))
-    # data = cur.fetchall()
-    # num_rows = len(data)
-    #
-    # # Get list of active messages from chat rel [FETCHALL]
-    # data = cur.fetchall()
-    # num_rows = len(data)
 
-    data = get_chat_rooms(1)
+    print (session['username'])
+    print (get_user_id(session['username']))
+    data =  get_chat_rooms(get_user_id(session['username']))
+
+    # data = get_chat_rooms(get_user_id(session['username']))
 
     num_rows = 0
     if data is not None:
@@ -607,27 +599,25 @@ def dashboard():
 
 ##############################################################################
 
-# Chats
-@app.route('/chat_rooms')
-def chat_rooms():
-
-    result = get_chat_rooms()  # chat titles, participants, creation times
-
-    if result is not None:
-        return render_template('chat_rooms.html', chat_rooms=result)
-    else:
-        msg = 'No Articles Found'
-        return render_template('chat_rooms.html', msg=msg)
-
 
 #Single chat room
 @app.route('/chat_room/<string:id>/')
 def chat_room(id):
-    # SQL SHIT TO GET MESSAGES
     data = get_messages_in_chatroom(id)
+    room_data = get_room_info(id)
 
-    # at the bottom of the page we need a post
-    return render_template('chat_room.html', chat_room=data)
+    form = MessageForm(request.form)
+    if request.method == 'POST' and form.validate():
+
+        insert_message(message=form.message.data,
+                       time=get_date(),
+                       user_id=get_user_id(session['username']),
+                       chat_id=id
+                       )
+
+        return render_template('chat_room.html', room=room_data, chat_room=data, form=form)
+   
+    return render_template('chat_room.html', room=room_data, chat_room=data, form=form)
 
 
 
@@ -642,7 +632,7 @@ def add_chat():
 
         ## SQL SHIT TO INSERT CHAT ROOM AND PARTICIPANTS
 
-        flash('Article Created', 'success')
+        flash('Chat room Created', 'success')
 
         return redirect(url_for('dashboard'))
 

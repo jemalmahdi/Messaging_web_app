@@ -2,7 +2,8 @@
 A file containing functions for quering the WooMessages database.
 """
 
-from database import get_db
+from database import *
+from exception_classes import *
 from collections import OrderedDict
 
 
@@ -91,7 +92,7 @@ def get_user_id(username):
 
     cur.execute(query, (username,))
 
-    user_id = cur.fetchone()
+    user_id = cur.fetchone()[0]
 
     if user_id is None:
         raise RequestError(422, 'User does not exist')
@@ -114,21 +115,24 @@ def get_messages_in_chatroom(chat_id):
 
     query = '''
         SELECT user.name AS "name", message.message AS "message",
-        message.time AS "time", chat.title AS "title" FROM user, message, chat
+        message.time AS "time", chat.title AS "title", chat.time AS "created"
+        FROM user, message, chat
         WHERE chat.id = ? AND message.chat_id = ? AND user.id = message.user_id
         ORDER BY time
     '''
 
     for row in cur.execute(query, (chat_id, chat_id)):
+        # create_date = row['created']
+        # title = row['title']
         message = row['message']
         name = row['name']
         time = row['time']
 
 
         if message not in list_of_messages:
-            list_of_messages[name, message, time] = []
+            list_of_messages[ name, message, time] = []
 
-        list_of_messages[name, message, time].append(row)
+        list_of_messages[ name, message, time].append(row)
 
     return list_of_messages
 
@@ -170,6 +174,36 @@ def get_chat_rooms(user_id):
     return room_data
 
 
+def get_room_info(chatroom_id):
+    """
+    Will get the title and time of creation for a chatroom based off of an id
+
+    :param chatroom_id: the id of the chatroom to collect info for
+    :return: an ordered dictionary of the chatroom information
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    room_data = OrderedDict()
+
+    query = '''
+        SELECT chat.title AS "title", chat.time AS "time"
+        FROM chat WHERE chat.id = ? ORDER BY time
+    '''
+
+    for row in cur.execute(query, (chatroom_id,)):
+        room_date = row['time']
+        room_title = row['title']
+
+        if room_date not in room_data:
+            room_data[room_title, room_date] = []
+
+        room_data[room_title, room_date].append(row)
+
+    return room_data
+
+
 def insert_chat_room(title, username_list):
     """
     will take information from the HTML to create a new chatroom
@@ -186,3 +220,19 @@ def insert_chat_room(title, username_list):
             raise RequestError(422, 'username does not exist')
         else:
             insert_chat_rel(chat_id, get_user_id(username))
+
+
+def delete_user_from_chat(username, chat_id):
+    """
+    This function removes a user from a chat. If there are no users in a chat,
+    the chat will also be deleted.
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    user_id = get_user_id(username)
+
+    cur.execute('DELETE FROM chat_rel WHERE user_id = ? AND chat_id = ?',
+                (user_id, chat_id))
+    conn.commit()

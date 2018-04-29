@@ -254,7 +254,7 @@ class UserView(MethodView):
         Handle GET requests.
         Returns JSON representing all of the users if user_id is None, or a
         single user if user_id is not None.
-        :param user_id: id of a user, or None for all users
+        :param id: id of a user, or None for all users
         :return: JSON response
         """
         if id is None:
@@ -262,7 +262,6 @@ class UserView(MethodView):
             return jsonify(user)
         else:
             user = query_by_id('user', id)
-
             if user is not None:
                 response = jsonify(user)
             else:
