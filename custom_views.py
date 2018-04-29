@@ -19,19 +19,19 @@ class ChatRelView(MethodView):
     This view handles all the /chatrel/ requests.
     """
 
-    def get(self, chatrel_id):
+    def get(self, id):
         """
         Handle GET requests.
         Returns JSON representing all of the logins if login_id is None, or a
         single login if login_id is not None.
-        :param chatrel_id: id of a login, or None for all logins
+        :param id: id of a login, or None for all logins
         :return: JSON response
         """
-        if chatrel_id is None:
+        if id is None:
             chatrel = get_all_rows('chat_rel')
             return jsonify(chatrel)
         else:
-            chatrel = query_by_id('chat_rel', chatrel_id)
+            chatrel = query_by_id('chat_rel', id)
 
             if chatrel is not None:
                 response = jsonify(chatrel)
@@ -47,16 +47,14 @@ class ChatRelView(MethodView):
         The username must be provided in the requests's form data.
         :return: a response containing the JSON representation of the login
         """
-        #Still working this one out.
-        if 'username' not in request.form:
-            raise RequestError(422, 'username required')
+        # Still working this one out.
+        if 'user_id' not in request.form:
+            raise RequestError(422, 'user_id required')
+        if 'chat_id' not in request.form:
+            raise RequestError(422, 'chat_id required')
         else:
-            if 'password' not in request.form:
-                raise RequestError(422, 'password required')
-            else:
-                response = jsonify(insert_login(request.form['username'],
-                                                request.form['password']))
-
+            response = jsonify(insert_chat_rel(request.form['user_id'],
+                                               request.form['chat_id']))
         return response
 
     def delete(self, chatrel_id):
@@ -128,19 +126,19 @@ class ChatRelView(MethodView):
 
 
 class MessageView(MethodView):
-    def get(self, message_id):
+    def get(self, id):
         """
         Handle GET requests.
         Returns JSON representing all of the message if message_id is None, or
         a single message if message_id is not None.
-        :param message_id: id of a message, or None for all messages
+        :param id: id of a message, or None for all messages
         :return: JSON response
         """
-        if message_id is None:
+        if id is None:
             messages = get_all_rows('message')
             return jsonify(messages)
         else:
-            messages = query_by_id('message', message_id)
+            messages = query_by_id('message', id)
 
             if messages is not None:
                 response = jsonify(messages)
@@ -158,13 +156,19 @@ class MessageView(MethodView):
         The message name must be provided in the requests's form data.
         :return: a response containing the JSON representation of the message
         """
-        if 'text' not in request.form:
+        if 'message' not in request.form:
             raise RequestError(422, 'text of message required')
-        elif 'user_id' not in request.form:
-            raise RequestError(422, 'user id required')
+        if 'time' not in request.form:
+            raise RequestError(422, 'time of message required')
+        if 'user_id' not in request.form:
+            raise RequestError(422, 'user_id of message required')
+        if 'chat_id' not in request.form:
+            raise RequestError(422, 'chat_id of message required')
         else:
-            response = jsonify(insert_message(request.form['text'],
-                                              request.form['user_id']))
+            response = jsonify(insert_message(request.form['message'],
+                                              request.form['time'],
+                                              request.form['user_id'],
+                                              request.form['chat_id']))
         return response
 
     def delete(self, message_id):
@@ -363,19 +367,19 @@ class UserView(MethodView):
 
 
 class ChatView(MethodView):
-    def get(self, chat_id):
+    def get(self, id):
         """
         Handle GET requests.
         Returns JSON representing all of the message if chat_id is None, or a
         single chat if chat_id is not None.
-        :param chat_id: id of a chat, or None for all chats
+        :param id: id of a chat, or None for all chats
         :return: JSON response
         """
-        if chat_id is None:
+        if id is None:
             chat = get_all_rows('chat')
             return jsonify(chat)
         else:
-            chat = query_by_id('chat', chat_id)
+            chat = query_by_id('chat', id)
 
             if chat is not None:
                 response = jsonify(chat)
@@ -392,11 +396,15 @@ class ChatView(MethodView):
         :param user_id: the id of the user creating the chat.
         :return: a response containing the JSON representation of the message
         """
-        if 'user_id' not in request.form:
-            raise RequestError(422, 'user id required')
+        if 'title' not in request.form:
+            raise RequestError(422, 'chat title required')
+        if 'time' not in request.form:
+            raise RequestError(422, 'chat time required')
         else:
+            response = jsonify(insert_chat(request.form['title'],
+                                           request.form['time']))
             #FIND SOMETHING THAT WORKS HERE
-            response = jsonify(insert_message(request.form['text'], user_id))
+            # response = jsonify(insert_message(request.form['text'], user_id))
         return response
 
     def delete(self, chat_id):

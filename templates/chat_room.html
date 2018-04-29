@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+  <h1>{{chat_room.title}}</h1>
+  <small>Created on {{chat_room.create_date}}</small>
+  <hr>
+  <div>
+    <table class="table table-striped">
+    <tr>
+      <th>User</th>
+      <th>Message</th>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+    </tr>
+    {% for user, message, date in chat_room %}
+      <tr>
+        <td>{{user}}</td>
+        <td>{{message}}</td>
+        <td>{{date}}</td>
+      </tr>
+    {% endfor %}
+  </table>
+  </div>
+{% endblock %}
