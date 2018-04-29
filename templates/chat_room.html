@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-
+<meta http-equiv="refresh" content="5" >
 {% block body %}
   {% for title, date in room %}
     <h1>{{title}}</h1>
@@ -26,7 +26,7 @@
   </div>
   <form action="" method="POST">
     <div class="form-group">
-      <input type="text" name="username" class="form-control" value={{request.form.username}}>
+      <input type="text" name="message" class="form-control" value={{request.form.message}}>
     </div>
     <button type="submit" class="btn btn-primary">Send</button>
   </form>

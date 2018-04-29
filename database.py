@@ -129,7 +129,7 @@ def get_date():
     """
     now = datetime.datetime.now()
 
-    return now.strftime("%Y-%m-%d %H:%M")
+    return now.strftime("%m/%d/%Y %H:%M")
 
 
 def insert_user(name, email, username, password):

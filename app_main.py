@@ -578,8 +578,6 @@ def dashboard():
     :return:
     """
 
-    print (session['username'])
-    print (get_user_id(session['username']))
     data =  get_chat_rooms(get_user_id(session['username']))
 
     # data = get_chat_rooms(get_user_id(session['username']))
@@ -601,19 +599,22 @@ def dashboard():
 
 
 #Single chat room
-@app.route('/chat_room/<string:id>/')
+@app.route('/chat_room/<string:id>/', methods=['GET', 'POST'])
 def chat_room(id):
     data = get_messages_in_chatroom(id)
     room_data = get_room_info(id)
 
+    print("Chat room=", id)
+
+    print("before posting")
     form = MessageForm(request.form)
     if request.method == 'POST' and form.validate():
-
         insert_message(message=form.message.data,
                        time=get_date(),
                        user_id=get_user_id(session['username']),
-                       chat_id=id
-                       )
+                       chat_id=id)
+
+        data = get_messages_in_chatroom(id)
 
         return render_template('chat_room.html', room=room_data, chat_room=data, form=form)
    
@@ -643,9 +644,10 @@ def add_chat():
 @app.route('/delete_chat/<string:id>', methods=['POST'])
 @is_logged_in
 def delete_chat(id):
-    ## SQL shit to delete chat
 
-    flash('Article Deleted', 'success')
+    delete_user_from_chat(session['username'], id)
+
+    flash('You have left the chat', 'success')
 
     return redirect(url_for('dashboard'))
 
