@@ -613,7 +613,7 @@ def chat_rooms():
 
     result = get_chat_rooms()  # chat titles, participants, creation times
 
-    if result > 0:
+    if result is not None:
         return render_template('chat_rooms.html', chat_rooms=result)
     else:
         msg = 'No Articles Found'
@@ -624,10 +624,10 @@ def chat_rooms():
 @app.route('/chat_room/<string:id>/')
 def chat_room(id):
     # SQL SHIT TO GET MESSAGES
-    data = get_messages_in_chatroom(id);
+    data = get_messages_in_chatroom(id)
 
     # at the bottom of the page we need a post
-    return render_template('chat_room.html', chat_room= data)
+    return render_template('chat_room.html', chat_room=data)
 
 
 

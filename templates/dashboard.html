@@ -7,7 +7,6 @@
   <table class="table table-striped">
     <tr>
       <th>Chat</th>
-      <th>Participants</th>
       <th>Date</th>
       <th></th>
       <th></th>
@@ -15,7 +14,6 @@
     {% for chat, date, id in chats %}
       <tr>
         <td>{{chat}}</td>
-        <td>{{id}}</td>
         <td>{{date}}</td>
           <!-- Link to enter chatroom-->
         <td><a href="chat_room/{{id}}" class="btn btn-default pull-right">Enter Room</a></td>
