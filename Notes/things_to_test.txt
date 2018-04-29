@@ -2,14 +2,14 @@ THINGS TO TEST -*- mode: org -*-
 ^ DO NOT REMOVE THAT ^
 
 * REST API
-** MESSAGE [0/5]
+** MESSAGE [
 *** Structure
 - id INTEGER PRIMARY KEY
 - message TEXT
 - time TEXT
 - user_id INTEGER FOREIGN KEY
 - chat_id INTEGER FOREIGN KEY
-*** Tests
+*** Tests [1/5]
 - [X] POST Message
   - provide message
   - provide user_id
@@ -23,14 +23,14 @@ THINGS TO TEST -*- mode: org -*-
   - [ ] PATCH message data
   - [ ] PATCH user_id data
 - [ ] DELETE Message
-** USER [1/5]
+** USER 
 *** Structure
 - id INTEGER PRIMARY KEY
 - name TEXT
 - email TEXT UNIQUE
 - username TEXT UNIQUE
 - password TEXT
-*** Chats
+*** Tests [1/5]
 - [X] POST User
   - provide user_name
 - [ ] GET User
@@ -41,12 +41,12 @@ THINGS TO TEST -*- mode: org -*-
 - [ ] PATCH User
   - provide user_name
 - [ ] DELETE User
-** CHAT [0/3]
+** CHAT 
 *** Structure
 - id INTEGER PRIMARY KEY
 - title TEXT
 - time TEXT
-*** Chats
+*** Tests [1/5]
 - [X] POST Chat
   - provide user_id
   - provide text
@@ -56,17 +56,17 @@ THINGS TO TEST -*- mode: org -*-
 - [ ] PATCH Chat
 - [ ] PUT Chat
 - [ ] DELETE chat
-** CHATREL [/]
+** CHATREL
 *** Structure
 - id INTEGER PRIMARY KEY
 - user_id INTEGER FOREIGN KEY
 - chat_id INTEGER FOREIGN KEY
-*** TESTS
-- [ ] POST
+*** TESTS [1/5]
+- [X] POST
 - [ ] GET
 - [ ] PUT
 - [ ] PATCH
 - [ ] DELETE
 
-* Group Meeting
-- 
+* Notes
+- Figure out why the GET isn't working
