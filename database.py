@@ -9,7 +9,8 @@ import os
 import sqlite3
 import csv
 import datetime
-from passlib.hash import sha256_crypt # a hash algorithm that encrypts password
+# a hash algorithm that encrypts password
+from passlib.hash import sha256_crypt
 
 
 app = Flask(__name__)
@@ -84,7 +85,6 @@ def convert_csv_to_sqlite(filename):
                           message_time=row['Time'],
                           message_content=row['Message'],
                           )
-
 
 
 def csv_row_generator(filename):

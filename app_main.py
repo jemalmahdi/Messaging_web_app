@@ -408,7 +408,8 @@ import click
 from flask import *
 from flask.ext.login import LoginManager, UserMixin, \
                                 login_required, login_user, logout_user
-from passlib.hash import sha256_crypt # a hash algorithm that encrypts password
+# a hash algorithm that encrypts password
+from passlib.hash import sha256_crypt
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from functools import wraps
 import os
@@ -483,14 +484,13 @@ def register():
                     username=form.username.data,
                     password=form.password.data)
 
-
         # Flash a message to the HTML cause we just registered babbyyyyyy
         flash('Congratulations! You have sold your soul to WooMessages! Next '
               'time, read terms and conditions. Proceed to Login.', 'success')
 
         # now that registered, send to login site
         return redirect(url_for('login'))
-    return render_template('RegisterationPage.html', form=form) # default GET
+    return render_template('RegisterationPage.html', form=form)  # default GET
 
 
 # User login
@@ -578,7 +578,7 @@ def dashboard():
     :return:
     """
 
-    data =  get_chat_rooms(get_user_id(session['username']))
+    data = get_chat_rooms(get_user_id(session['username']))
 
     # data = get_chat_rooms(get_user_id(session['username']))
 
@@ -598,7 +598,7 @@ def dashboard():
 ##############################################################################
 
 
-#Single chat room
+# Single chat room
 @app.route('/chat_room/<string:id>/', methods=['GET', 'POST'])
 def chat_room(id):
     data = get_messages_in_chatroom(id)
@@ -616,10 +616,11 @@ def chat_room(id):
 
         data = get_messages_in_chatroom(id)
 
-        return render_template('chat_room.html', room=room_data, chat_room=data, form=form)
-   
-    return render_template('chat_room.html', room=room_data, chat_room=data, form=form)
+        return render_template('chat_room.html', room=room_data,
+                               chat_room=data, form=form)
 
+    return render_template('chat_room.html', room=room_data, chat_room=data,
+                           form=form)
 
 # Add chat room
 @app.route('/add_chat', methods=['GET', 'POST'])
@@ -729,5 +730,5 @@ def create_views_with_rules():
 create_views_with_rules()
 
 if __name__ == "__main__":
-    app.secret_key='thisissecret'
+    app.secret_key = 'thisissecret'
     app.run(debug=True)

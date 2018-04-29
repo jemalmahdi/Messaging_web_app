@@ -131,11 +131,10 @@ def get_messages_in_chatroom(chat_id):
         name = row['name']
         time = row['time']
 
-
         if message not in list_of_messages:
-            list_of_messages[ name, message, time] = []
+            list_of_messages[name, message, time] = []
 
-        list_of_messages[ name, message, time].append(row)
+        list_of_messages[name, message, time].append(row)
 
     return list_of_messages
 
@@ -298,3 +297,20 @@ def insert_chat_room(title, username_list):
             raise RequestError(422, 'username {} does not exist'.format(username))
         else:
             insert_chat_rel(get_user_id(username), chat['id'])
+
+
+
+def delete_user_from_chat(username, chat_id):
+    """
+    This function removes a user from a chat. If there are no users in a chat,
+    the chat will also be deleted.
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    user_id = get_user_id(username)
+
+    cur.execute('DELETE FROM chat_rel WHERE user_id = ? AND chat_id = ?',
+                (user_id, chat_id))
+    conn.commit()
