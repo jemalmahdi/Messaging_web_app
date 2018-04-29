@@ -179,6 +179,8 @@ def insert_chat_room(title, username_list):
     :return: null
     """
 
+    print("entered inert chat room")
+
     chat_id = insert_chat(title, get_date())
 
     for username in username_list:
