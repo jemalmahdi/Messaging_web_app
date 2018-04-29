@@ -3,7 +3,14 @@ THINGS TO TEST -*- mode: org -*-
 
 * REST API
 ** MESSAGE [0/5]
-- [ ] POST Message
+*** Structure
+- id INTEGER PRIMARY KEY
+- message TEXT
+- time TEXT
+- user_id INTEGER FOREIGN KEY
+- chat_id INTEGER FOREIGN KEY
+*** Tests
+- [X] POST Message
   - provide message
   - provide user_id
 - [ ] GET Message
@@ -17,6 +24,13 @@ THINGS TO TEST -*- mode: org -*-
   - [ ] PATCH user_id data
 - [ ] DELETE Message
 ** USER [1/5]
+*** Structure
+- id INTEGER PRIMARY KEY
+- name TEXT
+- email TEXT UNIQUE
+- username TEXT UNIQUE
+- password TEXT
+*** Chats
 - [X] POST User
   - provide user_name
 - [ ] GET User
@@ -28,13 +42,31 @@ THINGS TO TEST -*- mode: org -*-
   - provide user_name
 - [ ] DELETE User
 ** CHAT [0/3]
-- [ ] POST Chat
+*** Structure
+- id INTEGER PRIMARY KEY
+- title TEXT
+- time TEXT
+*** Chats
+- [X] POST Chat
   - provide user_id
   - provide text
 - [ ] GET Chat
   - [ ] GET one
   - [ ] GET all
+- [ ] PATCH Chat
+- [ ] PUT Chat
 - [ ] DELETE chat
+** CHATREL [/]
+*** Structure
+- id INTEGER PRIMARY KEY
+- user_id INTEGER FOREIGN KEY
+- chat_id INTEGER FOREIGN KEY
+*** TESTS
+- [ ] POST
+- [ ] GET
+- [ ] PUT
+- [ ] PATCH
+- [ ] DELETE
 
 * Group Meeting
 - 

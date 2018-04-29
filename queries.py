@@ -91,12 +91,12 @@ def get_user_id(username):
 
     cur.execute(query, (username,))
 
-    id = cur.fetchone()
+    user_id = cur.fetchone()
 
-    if id is None:
+    if user_id is None:
         raise RequestError(422, 'User does not exist')
     else:
-        return id
+        return user_id
 
 
 def get_messages_in_chatroom(chat_id):
@@ -114,18 +114,21 @@ def get_messages_in_chatroom(chat_id):
 
     query = '''
         SELECT user.name AS "name", message.message AS "message",
-        message.time AS time, chat.title AS "title" FROM user, message, chat
+        message.time AS "time", chat.title AS "title" FROM user, message, chat
         WHERE chat.id = ? AND message.chat_id = ? AND user.id = message.user_id
         ORDER BY time
     '''
 
     for row in cur.execute(query, (chat_id, chat_id)):
         message = row['message']
+        name = row['name']
+        time = row['time']
+
 
         if message not in list_of_messages:
-            list_of_messages[message] = []
+            list_of_messages[name, message, time] = []
 
-        list_of_messages[message].append(row)
+        list_of_messages[name, message, time].append(row)
 
     return list_of_messages
 
@@ -142,23 +145,44 @@ def get_chat_rooms(user_id):
     conn = get_db()
     cur = conn.cursor()
 
-    list_of_rooms = OrderedDict()
+    room_data = OrderedDict()
 
     query = '''
-        SELECT chat.title AS "Chat Room", user.name AS "Name"
+        SELECT chat.title AS "title", user.name AS "participants",
+        chat.time AS "create_date", chat.id AS "id"
         FROM chat, chat_rel, user
         WHERE chat_rel.user_id = user.id
         AND chat_rel.chat_id = chat.id
         AND user.id = ?
-        ORDER BY chat.title, chat.time;
+        ORDER BY chat.time, chat.title;
     '''
 
     for row in cur.execute(query, (user_id,)):
-        room = row['Chat Room']
+        room_name = row['title']
+        room_date = row['create_date']
+        room_id = row['id']
 
-        if room not in list_of_rooms:
-            list_of_rooms[room] = []
+        if room_name not in room_data:
+            room_data[room_name, room_date, room_id] = []
 
-        list_of_rooms[room].append(row)
+        room_data[room_name, room_date, room_id].append(row)
 
-    return list_of_rooms
+    return room_data
+
+
+def insert_chat_room(title, username_list):
+    """
+    will take information from the HTML to create a new chatroom
+
+    :param title: the title of the chat
+    :param username_list: a list of usernames to be added
+    :return: null
+    """
+
+    chat_id = insert_chat(title, get_date())
+
+    for username in username_list:
+        if get_user_by_username(username):
+            raise RequestError(422, 'username does not exist')
+        else:
+            insert_chat_rel(chat_id, get_user_id(username))
