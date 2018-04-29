@@ -312,3 +312,153 @@ def get(test_client, data):
 
     response = test_client.get(api_path+str(id_out_of_bounds))
     assert response.status_code == 404
+# ----------END GET TESTS----------
+
+
+# ----------BEGIN GET TESTS----------
+def test_put_user(test_client):
+    api_path = '/api/user/'
+    user_complete = {
+        'name': 'TestUser',
+        'email': 'test@test.test',
+        'username': 'user',
+        'password': 'sup3rs3cur3passw0rd'
+    }
+    expected_keys = ('id', 'name', 'email', 'username', 'password')
+    expected_values = {
+        'id': 1,
+        'name': 'TestUser',
+        'email': 'test@test.test',
+        'username': 'user',
+        'password': None
+    }
+    id = 1
+    id_out_of_bounds = 100
+    data = (api_path,
+            id,
+            id_out_of_bounds,
+            user_complete,
+            expected_values,
+            expected_keys)
+    put(test_client, data)
+
+
+def test_put_chat(test_client):
+    api_path = '/api/chat/'
+    chat_complete = {
+        'title': 'TestChat',
+        'time': '12:00'
+    }
+    expected_keys = ('id', 'title', 'time')
+    expected_values = {
+        'id': 1,
+        'title': 'TestChat',
+        'time': '12:00'
+    }
+    id = 1
+    id_out_of_bounds = 100
+    data = (api_path,
+            id,
+            id_out_of_bounds,
+            chat_complete,
+            expected_values,
+            expected_keys)
+    put(test_client, data)
+
+
+def test_put_message(test_client):
+    api_path = '/api/message/'
+    chat_complete = {
+        'message': 'Hello world!',
+        'time': '14:00',
+        'user_id': 1,
+        'chat_id': 1
+    }
+    expected_keys = ('id', 'message', 'time', 'user_id', 'chat_id')
+    expected_values = {
+        'id': 1,
+        'message': 'Hello world!',
+        'time': '14:00',
+        'user_id': 1,
+        'chat_id': 1
+    }
+    id = 1
+    id_out_of_bounds = 100
+    data = (api_path,
+            id,
+            id_out_of_bounds,
+            chat_complete,
+            expected_values,
+            expected_keys)
+    put(test_client, data)
+
+
+def test_put_chatrel(test_client):
+    api_path = '/api/chatrel/'
+    chatrel_complete = {
+        'user_id': 1,
+        'chat_id': 1
+    }
+    expected_keys = ('id', 'user_id', 'chat_id')
+    expected_values = {
+        'id': 1,
+        'user_id': 1,
+        'chat_id': 1
+    }
+    id = 1
+    id_out_of_bounds = 100
+    data = (api_path,
+            id,
+            id_out_of_bounds,
+            chatrel_complete,
+            expected_values,
+            expected_keys)
+    put(test_client, data)
+
+
+def put(test_client, data):
+    """
+    Tests the PUT API functionality
+
+    :param test_client: flask test client
+    :param data: a tuple of the values to test. (api_path, id,
+    id_out_of_bounds, user_complete, expected_values, expected_keys)
+    """
+    api_path = data[0]
+    id = data[1]
+    id_out_of_bounds = data[2]
+    user_complete = data[3]
+    expected_values = data[4]
+    expected_keys = data[5]
+
+    # executes a PUT request and checks the status code for success
+    response = test_client.put(api_path+str(id), data=user_complete)
+    assert response.status_code == 200
+
+    # checks that the keys in the response are as expected
+    response_json = json.loads(response.data)
+    assert check_keys(expected_keys, response_json)
+
+    # A special case for testing the posing of users. It checks that the
+    # passwords match and then updates the expected_values to have the
+    # password in it. This is done so the check_values assertion below works.
+    if 'password' in expected_values and expected_values['password'] is None:
+        assert sha256_crypt.verify(user_complete['password'],
+                                   response_json['password'])
+        expected_values['password'] = response_json['password']
+
+    # checks that the data in the response is as expected
+    assert check_values(expected_values, response_json)
+
+    # executes a GET request
+    response = test_client.get(api_path+str(id))
+    assert response.status_code == 200
+
+    # checks if the GET request data was as expected
+    response_json = json.loads(response.data)
+    assert check_values(expected_values, response_json)
+
+    # attempt to put an invalid id
+    response = test_client.put(api_path+str(id_out_of_bounds),
+                               data=user_complete)
+    assert response.status_code == 404
