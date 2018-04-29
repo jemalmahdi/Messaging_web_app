@@ -11,13 +11,18 @@ To run flask app:
  flask run
   
 To initalise db:
- export FLASK_APP=app_main.py
- flask initdb
+    export FLASK_APP=app_main.py
+     flask initdb
 
 To initalise db with CSV data:
- export FLASK_APP=app_main.py
- flask initdb_with_csv <filename>
+
+    export FLASK_APP=app_main.py
+    flask initdb_with_csv <filename>
   
 To test db:
- sqlite3 WooMessages.sqlite < test_db.sql
+
+    sqlite3 WooMessages.sqlite < test_db.sql
   
+To run tests:
+
+    python3 -m pytest -v test_flask_api.py
