@@ -1,5 +1,10 @@
 """
-CS232
+WooMessages
+CS 232
+Final Project
+
+
+AVI VAJPEYI, JEMAL JEMAL, ISAAC WEISS, MORGAN THOMPSON
 
 A file containing the declarations and definitions of custom MethodViews.
 There are three customMethodViews: ArtistView, AlbumView and TrackView.
