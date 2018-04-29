@@ -603,6 +603,9 @@ def dashboard():
 def chat_room(id):
     data = get_messages_in_chatroom(id)
     room_data = get_room_info(id)
+    participant_list = get_participants_in_chat(id)
+    participant_str = ", ".join(
+        str(participant) for participant in participant_list)
 
     print("Chat room=", id)
 
@@ -616,11 +619,12 @@ def chat_room(id):
 
         data = get_messages_in_chatroom(id)
 
-        return render_template('chat_room.html', room=room_data,
-                               chat_room=data, form=form)
 
-    return render_template('chat_room.html', room=room_data, chat_room=data,
-                           form=form)
+        return render_template('chat_room.html', names=participant_str,
+                               room=room_data, chat_room=data, form=form)
+
+    return render_template('chat_room.html', names=participant_str,
+                           room=room_data, chat_room=data, form=form)
 
 # Add chat room
 @app.route('/add_chat', methods=['GET', 'POST'])
@@ -654,7 +658,7 @@ def delete_chat(id):
 
     chat_name = get_chat_room_name(id)
 
-    flash('You have left the chat {}'.format(chat_name), 'success')
+    flash('You have left the chat \"{}\"'.format(chat_name), 'success')
 
     return redirect(url_for('dashboard'))
 
