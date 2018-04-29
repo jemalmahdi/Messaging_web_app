@@ -12,6 +12,7 @@ import datetime
 # a hash algorithm that encrypts password
 from passlib.hash import sha256_crypt
 
+
 app = Flask(__name__)
 app.config['DATABASE'] = os.path.join(app.root_path, 'WooMessages.sqlite')
 
@@ -143,6 +144,7 @@ def insert_user(name, email, username, password):
     :param password: user's password
     :return: inserted row as a dictionary
     """
+
     # hash and salt password
     password = sha256_crypt.encrypt(str(password))
 
@@ -364,7 +366,7 @@ def check_chat(title):
     cur = conn.cursor()
 
     query = '''
-        SELECT * FROM chat WHERE title = ?
+    SELECT * FROM chat WHERE title = ?
     '''
 
     cur.execute(query, (title,))
@@ -390,6 +392,7 @@ def check_chat_rel(user_id, chat_id):
         AND chat_id = ?;
     '''
 
+    # print("UID:{}, CID:{}".format(user_id, chat_id))
     cur.execute(query, (user_id, chat_id))
 
     content = cur.fetchone()
@@ -398,3 +401,6 @@ def check_chat_rel(user_id, chat_id):
         return content['id']
     else:
         return None  # none instead of 0 cause 0 might be a chat id
+
+
+
