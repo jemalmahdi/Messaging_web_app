@@ -114,7 +114,7 @@ def test_post_chatrel(test_client):
             chatrel_partial,
             expected_keys,
             expected_values)
-    post (test_client, data)
+    post(test_client, data)
 
 
 def post(test_client, data):
