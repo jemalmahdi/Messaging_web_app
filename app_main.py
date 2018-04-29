@@ -448,7 +448,7 @@ def initdb_command():
 @click.argument('filename')
 def convert_csv_to_sqlite_command(filename):
     convert_csv_to_sqlite(filename)
-    print('Inserted' + filename)
+    print('Inserted ' + filename)
 
 
 @login_manager.user_loader
@@ -600,6 +600,7 @@ def dashboard():
 @app.route('/chat_room/<string:id>/')
 def chat_room(id):
     data = get_messages_in_chatroom(id)
+    room_data = get_room_info(id)
 
     form = MessageForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -610,10 +611,9 @@ def chat_room(id):
                        chat_id=id
                        )
 
-        return render_template('chat_room.html', chat_room=data, form=form)
-    # at the bottom of the page we need a post
-    return render_template('chat_room.html', chat_room=data, form=form)
-
+        return render_template('chat_room.html', room=room_data, chat_room=data, form=form)
+   
+    return render_template('chat_room.html', room=room_data, chat_room=data, form=form)
 
 
 
