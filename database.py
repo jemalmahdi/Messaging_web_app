@@ -353,6 +353,25 @@ def delete_item(table_name, item_id):
     return None
 
 
+def delete_user_from_chat(username, chat_id):
+    """
+    This function removes a user from a chat. If there are no users in a chat,
+    the chat will also be deleted.
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute('SELECT id FROM user WHERE username = ?', (username,))
+    conn.commit()
+
+    user_id = int(cur.fetchone())
+
+    cur.execute('DELETE FROM chat_rel WHERE user_id = ? AND chat_id = ?',
+                (user_id, chat_id))
+    conn.commit()
+
+
 def check_chat(title):
     """
     THis function will only be called when filling a csv. That is to ensure
