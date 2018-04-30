@@ -1,4 +1,8 @@
 """
+WooMessages
+CS 232
+Final Project
+AVI VAJPEYI, JEMAL JEMAL, ISAAC WEISS, MORGAN THOMPSON
 
 A file containing functions for database creation and the functions required
 for updating/inserting/deleting from the database's tables.

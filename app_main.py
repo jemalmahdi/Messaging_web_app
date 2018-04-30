@@ -2,8 +2,6 @@
 WooMessages
 CS 232
 Final Project
-
-
 AVI VAJPEYI, JEMAL JEMAL, ISAAC WEISS, MORGAN THOMPSON
 
 This Flask app allows a user to interact with a music artist database in a
@@ -17,24 +15,26 @@ $ pip install WTForms
 $ pip install tabulate
 $ pip install flask_login
 $ pip install passlib
+$ pip install pytest
 $ export FLASK_APP=app_main.py
 $ flask run
 
 *******************************************************************************
 A general description of the WooMessage API is as follows.
 
-There are three types of resources: Artists, Albums, Tracks
+There are two types of resources: user, chat
 
---ARTISTS
-An artist resource is an individual musical artist.
+--USER
+An user resource is an individual user.
 
     Attributes:
+    email string -- The email of the user
     id int -- The unique number to represent this resource.
     name string -- The name of the artist.
-    age int -- The age of the artist.
+    password string --
+    username string --
 
-
-GET /artist
+GET /user
 
 Description:
 Get a list of all artists
@@ -46,14 +46,18 @@ Example usage:
 $ curl -X GET http://127.0.0.1:5000/artists/
 [
   {
-        "id": 1,
-        "name": Bob,
-        "age": 80,
+    "email": "JJemal20@wooster.edu",
+    "id": 1,
+    "name": "Jemal",
+    "password": "$5$rounds=535000$oBWsPrEhsccUSqEH$ut/SZIwokcxcNFHlrX/cEu5AIl2iUm4wWIClyi8bCt.",
+    "username": "JemalMahdi"
   },
   {
-        "id": 1,
-        "name": Bobbie,
-        "age": 8,
+    "email": "Avajpai18@wooster.edu",
+    "id": 2,
+    "name": "Avi",
+    "password": "$5$rounds=535000$68DCPBEA.GfYxWWD$eiN6GrnZWEUyz0XFCj27G/XqwpCGUBA/dJRJi5JSBbC",
+    "username": "AviVajpeyi"
   }
 ]
 
