@@ -470,5 +470,3 @@ def put(test_client, data):
     response = test_client.put(api_path+str(id_out_of_bounds),
                                data=user_complete)
     assert response.status_code == 404
-
-

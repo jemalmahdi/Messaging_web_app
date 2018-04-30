@@ -20,250 +20,244 @@ $ export FLASK_APP=app_main.py
 $ flask run
 
 *******************************************************************************
+OUTSIDE SOURCES
+
+Code for the login+logout adapted from a blog in the website
+http://flask.pocoo.org/snippets/98/
+
+Code for the WTForms obtained from another page of the same blog website
+http://flask.pocoo.org/docs/0.12/patterns/wtforms/
+
+*******************************************************************************
 A general description of the WooMessage API is as follows.
 
-There are two types of resources: user, chat
+There are three types of resources: user, chat, message
 
 --USER
 An user resource is an individual user.
 
     Attributes:
-    email string -- The email of the user
+    email string -- The unique email of the user
     id int -- The unique number to represent this resource.
-    name string -- The name of the artist.
-    password string --
-    username string --
+    name string -- The name of the user.
+    password string -- The ENCRYPTED password of the user.
+    username string -- The unique username associated with the user.
 
 GET /user
 
 Description:
-Get a list of all artists
+Get a list of all users
 
 Parameters:
 None
 
 Example usage:
-$ curl -X GET http://127.0.0.1:5000/artists/
+$ curl -X GET http://127.0.0.1:5000/api/user/
 [
   {
     "email": "JJemal20@wooster.edu",
     "id": 1,
     "name": "Jemal",
-    "password": "$5$rounds=535000$oBWsPrEhsccUSqEH$ut/SZIwokcxcNFHlrX/cEu5AIl2iUm4wWIClyi8bCt.",
+    "password": "$5$rounds=535000$oBWsPrEhsccUSqEH$ut/SZIwokcxcNFHWIClyi8bCt.",
     "username": "JemalMahdi"
   },
   {
     "email": "Avajpai18@wooster.edu",
     "id": 2,
     "name": "Avi",
-    "password": "$5$rounds=535000$68DCPBEA.GfYxWWD$eiN6GrnZWEUyz0XFCj27G/XqwpCGUBA/dJRJi5JSBbC",
+    "password": "$5$rounds=535000$68DCPBEA.GfYxWWD$eiN6GrnZWEJi5JSBbC",
     "username": "AviVajpeyi"
   }
 ]
 
-GET /artists/:id
+GET /user/:id
 
 Description:
-Get a single artist by ID
+Get a single user by ID number
 
 Parameters:
-id - the ID of the dog
+id - the ID of the user
 
 Example usage:
-$ curl -X GET http://127.0.0.1:5000/artists/1
+$ curl -X GET http://127.0.0.1:5000/api/user/1
 {
+    "email": "JJemal20@wooster.edu",
     "id": 1,
-    "name": Bobbie,
-    "age": 8,
+    "name": "Jemal",
+    "password": "$5$rounds=535000$oBWsPrEhsccUSqEH$ut/SZIwokcxcNFHlrX/cEu5t.",
+    "username": "JemalMahdi"
 }
 
 
-POST /artist
+POST /user
+-- NOT POSSIBLE because the password needs to encrypted with a secret key
+
+
+PUT /user
+-- NOT POSSIBLE because the password needs to encrypted with a secret key
+
+
+PATCH /user
 
 Description:
-Add a new artist and get the added artist in response
+Update one or more attributes (ID and username fixed) of an user and
+get the updated user in response.
 
+Parameters:
+id - the id of the user
 
 Example usage:
-$ curl -X POST -d "name"="Elvis" -d "age="131" http://127.0.0.1:5000/artists/
+$ curl -X PATCH -d "name"="Jimmy" http://127.0.0.1:5000/api/user/1
 {
-    "id": 1,
-    "name": Bobbie,
-    "age": 8,
+  "email": "JJemal20@wooster.edu",
+  "id": 1,
+  "name": "Jimmy",
+  "password": "$5$rounds=535000$oBWsPrEhsccUSqEH$ut/SZIwokcxcNFHlrX/cEu5AIl",
+  "username": "JemalMahdi"
 }
 
 
-PUT /artist
+DELETE /user
 
 Description:
-Update ALL attributes of an artist and
-get the updated artist in response
+Delete an user and get the deleted user in response
 
 Parameters:
-id - the id of the artist
-
-
-Example usage:
-$ curl -X PUT -d "name"="Elvis" -d "age="131" http://127.0.0.1:5000/artists/1
-{
-    "id": 1,
-    "name": Bobbie,
-    "age": 8,
-}
-
-
-PATCH /artist
-
-Description:
-Update one or more attributes of an artist and
-get the updated artist in response
-
-Parameters:
-id - the id of the artist
+id - the id of the user
 
 Example usage:
-$ curl -X PATCH -d "name"="Elvis" -d "age="131" http://127.0.0.1:5000/artists/1
+$ curl -X DELETE http://127.0.0.1:5000/api/user/1
 {
-    "id": 1,
-    "name": Bobbieee,
-    "age": 8,
-}
-
-
-DELETE /artist
-
-Description:
-Delete an artist and get the deleted artist in response
-
-Parameters:
-id - the id of the artist
-
-Example usage:
-$ curl -X DELETE http://127.0.0.1:5000/artists/1
-{
-    "id": 1,
-    "name": Bobbie,
-    "age": 8,
+  "email": "JJemal20@wooster.edu",
+  "id": 1,
+  "name": "Jimmy",
+  "password": "$5$rounds=535000$oBWsPrEhsccUSqEH$ut/SZIwokcxcNFHlrX/cEu5AIl2.",
+  "username": "JemalMahdi"
 }
 
 *******************************************************************************
---Albums
-An album resource is an individual musical album.
+--Chat
+An chat resource is an individual chat room data.
 
     Attributes:
     id int -- The unique number to represent this resource.
-    name string -- The name of the album.
-    artist_id int -- The id of the artist who created the album.
+    time string --- The time (d/m/y HH:MM) the chat room was created.
+    title string -- The name of the chat room.
 
 
-GET /album
+GET /chat
 
 Description:
-Get a list of all albums
+Get a list of all chat
 
 Parameters:
 None
 
 Example usage:
-$ curl -X GET http://127.0.0.1:5000/albums/
+$ curl -X GET http://127.0.0.1:5000/api/chat/
 [
   {
-        "id": 1,
-        "name": Bob,
-        "artist_id": 80,
+    "id": 1,
+    "time": "4/25/18 21:49",
+    "title": "School is good"
   },
   {
-        "id": 1,
-        "name": Bobbie,
-        "artist_id": 8,
+    "id": 2,
+    "time": "5/4/18 21:49",
+    "title": "I hate life"
   }
 ]
 
-GET /albums/:id
+GET /chat/:id
 
 Description:
-Get a single album by ID
+Get a single chat by ID
 
 Parameters:
-id - the ID of the album
+id - the ID of the chat
 
 Example usage:
-$ curl -X GET http://127.0.0.1:5000/albums/1
+$ curl -X GET http://127.0.0.1:5000/api/chat/1
 {
     "id": 1,
-    "name": Bobbie,
-    "artist_id": 8,
+    "time": "4/25/18 21:49",
+    "title": "School is good"
 }
 
 
-POST /album
+POST /chat
 
 Description:
-Add a new album and get the added album in response
+Add a new chat and get the added chat in response
 
 Example usage:
-$ curl -X POST -d "name"="Elvis" -d "age="131" http://127.0.0.1:5000/albums/
+$ curl -X POST -d "title"="School" -d "time"="4/25/18 21:49"
+http://127.0.0.1:5000/albums/
 {
     "id": 1,
-    "name": Bobbie,
-    "artist_id": 8,
+    "time": "4/25/18 21:49",
+    "title": "School"
 }
+
 
 
 PUT /album
 
 Description:
-Update ALL attributes of an album and
-get the updated album in response
+Update ALL attributes of a chat and
+get the updated chat in response
 
 Parameters:
-id - the id of the album
+id - the id of the chat
 
 Example usage:
-$ curl -X POST -d "name"="Elvis" -d "age="131" http://127.0.0.1:5000/albums/1
+$ curl -X POST -d "title"="cool" -d "time"="4/25/18 21:49"
+http://127.0.0.1:5000/api/chat/1
 {
-    "id": 1,
-    "name": Bobbie,
-    "artist_id": 8,
+"id": 1,
+    "time": "4/25/18 21:49",
+    "title": "cool"
 }
+
 
 PATCH /album
 
 Description:
-Update one or more attributes of an album and
-get the updated album in response
+Update one or more attributes of an chat and
+get the updated chat in response
 
 Parameters:
 id - the id of the album
 
 Example usage:
-$ curl -X PATCH -d "name"="Elvis" -d "age="131" http://127.0.0.1:5000/albums/1
+$ curl -X POST -d "title"="cool" -d "time"="4/25/18 21:49"
+http://127.0.0.1:5000/api/chat/1
 {
     "id": 1,
-    "name": Bobbie,
-    "artist_id": 8,
+    "time": "4/25/18 21:49",
+    "title": "cool"
 }
 
 
-DELETE /album
+DELETE /chat
 
 Description:
-Delete an album and get the deleted album in response
+Delete an chat and get the deleted chat in response
 
 Parameters:
-id - the id of the album
+id - the id of the chat
 
 Example usage:
-$ curl -X DELETE http://127.0.0.1:5000/albums/1
+$ curl -X DELETE http://127.0.0.1:5000/api/chat/1
 {
     "id": 1,
-    "name": Bobbie,
-    "artist_id": 8,
+    "time": "4/25/18 21:49",
+    "title": "cool"
 }
 
 *******************************************************************************
---Track
-A track resource is an individual musical track.
+--Message
+A message resource is an individual message sent by a user in on chat room.
 
     Attributes:
     album_id int -- The id of the album the track is from
@@ -271,70 +265,82 @@ A track resource is an individual musical track.
     id int -- The unique number to represent this resource.
     name string -- The name of the track.
 
+    id int -- The unique number to represent this resource.
+    user_id int -- The id of the user who sent the message
+    chat_id int -- The id of the chat where the message is sent
+    message string -- The message content of the message
+    time string -- the time the message was sent
 
-GET /tracks/
+
+GET /message/
 
 Description:
-Get a list of all tracks
+Get a list of all messages
 
 Parameters:
 None
 
 Example usage:
-$ curl -X GET http://127.0.0.1:5000/tracks/
+$ curl -X GET http://127.0.0.1:5000/api/message/
 [
   {
-    "album_id": 1,
-    "duration": 156,
+    "chat_id": 1,
     "id": 1,
-    "name": "Ace of Spades"
+    "message": "Boy I like school",
+    "time": "4/25/18 21:49",
+    "user_id": 1
   },
   {
-    "album_id": 2,
-    "duration": 120,
+    "chat_id": 1,
     "id": 2,
-    "name": "All My Life"
+    "message": "I like donkeys",
+    "time": "4/26/18 21:49",
+    "user_id": 2
   }
 ]
 
-GET /tracks/:id
+GET /message/:id
 
 Description:
-Get a single track by ID
+Get a single message by ID
 
 Parameters:
-id - the ID of the track
+id - the ID of the message
 
 Example usage:
-$ curl -X GET http://127.0.0.1:5000/tracks/1
+$ curl -X GET http://127.0.0.1:5000/message/1
 {
-    "album_id": 1,
-    "duration": 156,
-    "id": 1,
-    "name": "Ace of Spades"
+    "chat_id": 1,
+    "id": 3,
+    "message": "nah. i think school sucks",
+    "time": "4/27/18 21:49",
+    "user_id": 3
 }
 
 
-POST /tracks/
+
+POST /message/
 
 Description:
-Add a new track and get the added track in response
+Add a new message and get the added message in response
 
 Parameters:
-id - the id of the track
+id - the id of the message
 
 Example usage:
-$ curl -X POST -d "album_id"="23" -d "duration"="23" -d "name"="Blah"
-http://127.0.0.1:5000/tracks/1
+$ curl -X POST -d "message"="HI" -d "chat_id"="3" -d "user_id"="1"
+-d "time"="4/27/18 21:49"
+http://127.0.0.1:5000/api/message/1
 {
-    "album_id": 23,
-    "duration": 23,
-    "id": 1,
-    "name": "Blah"
+    "chat_id": 1,
+    "id": 3,
+    "message": "nah. i think school sucks",
+    "time": "4/27/18 21:49",
+    "user_id": 3
 }
 
 
-PUT /tracks/
+PUT /message/:id
 
 Description:
 Update ALL attributes of an track (other than ID) and
@@ -344,19 +350,19 @@ Parameters:
 id - the id of the track
 
 Example usage:
-$ curl -X PUT -d "album_id"="23" -d "duration"="23" -d "name"="Blah"
-http://127.0.0.1:5000/tracks/1
+$ curl -X POST -d "message"="HI" -d "chat_id"="3" -d "user_id"="1"
+-d "time"="4/27/18 21:49" http://127.0.0.1:5000/api/message/1
 {
-    "album_id": 1,
-    "duration": 156,
-    "id": 1,
-    "name": "Ace of Spades"
+    "chat_id": 1,
+    "id": 3,
+    "message": "nah. i think school sucks",
+    "time": "4/27/18 21:49",
+    "user_id": 3
 }
 
 
 
-PATCH -d album_id="1" -d duration="155" \
-http://127.0.0.1:5000/track/1
+PATCH /message/:id
 
 Description:
 Update one or more attributes of an track and
@@ -366,17 +372,18 @@ Parameters:
 id - the id of the track
 
 Example usage:
-$ curl -X PATCH -d "duration"="23" http://127.0.0.1:5000/tracks/1
+$ curl -X PATCH -d "message"="HI" -d "chat_id"="3" -d "user_id"="1"
+-d "time"="4/27/18 21:49" http://127.0.0.1:5000/api/message/1
 {
-    "album_id": 1,
-    "duration": 23,
-    "id": 1,
-    "name": "Ace of Spades"
+    "chat_id": 1,
+    "id": 3,
+    "message": "nah. i think school sucks",
+    "time": "4/27/18 21:49",
+    "user_id": 3
 }
 
 
-
-DELETE /tracks/:id
+DELETE /message/:id
 
 Description:
 Delete an track and get the deleted track in response
@@ -385,47 +392,33 @@ Parameters:
 id - the id of the track
 
 Example usage:
-$ curl -X DELETE http://127.0.0.1:5000/tracks/1
+$ curl -X DELETE http://127.0.0.1:5000/api/message/1
 {
-    "album_id": 1,
-    "duration": 156,
-    "id": 1,
-    "name": "Ace of Spades"
+    "chat_id": 1,
+    "id": 3,
+    "message": "nah. i think school sucks",
+    "time": "4/27/18 21:49",
+    "user_id": 3
 }
-
-
 
 *******************************************************************************
 """
-from flask import Flask, g, jsonify, request, render_template
-from flask.views import MethodView
-import os
-import csv
-import sqlite3
-from collections import OrderedDict
-
-from flask import Flask, g, jsonify, request, \
-    render_template, redirect, url_for
-import os
+# Imported Scripts
 import click
-
 from flask import *
 from flask.ext.login import LoginManager, UserMixin, \
                                 login_required, login_user, logout_user
 # a hash algorithm that encrypts password
 from passlib.hash import sha256_crypt
-from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from functools import wraps
 import os
 
-from login_source import *
+# Our Scripts
 from custom_views import *
 from database import *
-from Social_Media import *
 from exception_classes import *
 from queries import *
 from custom_forms import *
-import tabulate
 
 
 app = Flask(__name__)
@@ -445,6 +438,10 @@ login_manager.login_view = "login"
 
 @app.cli.command('initdb')
 def initdb_command():
+    """
+    Helper function to initialise DB
+    :return: None
+    """
     init_db()
     print('Database Created')
 
@@ -452,6 +449,11 @@ def initdb_command():
 @app.cli.command('initdb_with_csv')
 @click.argument('filename')
 def convert_csv_to_sqlite_command(filename):
+    """
+    Helper function to convert
+    :param filename:
+    :return: None
+    """
     convert_csv_to_sqlite(filename)
     print('Inserted ' + filename)
 
@@ -478,6 +480,11 @@ def home_page():
 # User Register
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    """
+    Serves the registeration page
+
+    :return: The login page if POST the Registeration page if GET
+    """
     form = RegisterForm(request.form)
     if request.method == 'POST' and form.validate():
         # check if there is a post request and if the data inputted to form
@@ -500,6 +507,11 @@ def register():
 # User login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    Serves the login page.
+
+    :return: returns the Login.html
+    """
     if request.method == 'POST':
         # Get Form Fields
         username = request.form['username']
@@ -529,7 +541,7 @@ def login():
         else:
             error = 'Username not found'
             flash("WHO IS U??? Username not found", 'danger')
-            return render_template('login.html', error=error)
+            return render_template('Login.html', error=error)
 
     return render_template('Login.html')
 
@@ -537,10 +549,11 @@ def login():
 # Check if user logged in
 def is_logged_in(f):
     """
-    Code adapted from http://flask.pocoo.org/snippets/98/
+    This is a function decoration we have written to check if the user is
+    logged in.
 
-    :param f:
-    :return:
+    :param f: function to decorate with this check
+    :return: returns the wrapped function
     """
     @wraps(f)
     def wrap(*args, **kwargs):
@@ -556,6 +569,11 @@ def is_logged_in(f):
 @app.route('/logout')
 @is_logged_in
 def logout():
+    """
+    Deletes a session to log a user out.
+
+    :return: the Login Page.
+    """
     session.clear()
     flash('Logged out!', 'success')
     return redirect(url_for('login'))
@@ -565,9 +583,10 @@ def logout():
 @app.errorhandler(401)
 def page_not_found(e):
     """
+    HTML for a 401 error during Login
 
-    :param e:
-    :return:
+    :param e: The thrown error
+    :return: An HTML with "Login failed"
     """
     return Response('<p>Login failed!</p>')
 
@@ -577,14 +596,13 @@ def page_not_found(e):
 @is_logged_in
 def dashboard():
     """
-
+    Obtains the information to send to the dashboard.html such as info
+    on the various chat rooms that the user is a part of.
 
     :return:
     """
 
     data = get_chat_rooms(get_user_id(session['username']))
-
-    # data = get_chat_rooms(get_user_id(session['username']))
 
     num_rows = 0
     if data is not None:
@@ -604,7 +622,16 @@ def dashboard():
 
 # Single chat room
 @app.route('/chat_room/<string:id>/', methods=['GET', 'POST'])
+@is_logged_in
 def chat_room(id):
+    """
+    Obtains the information to send to the chat_room.html such as info
+    on the chat room name, etc, the messages in the chat room, and a form
+    to enter new messages.
+
+    :param id: The chat room id
+    :return: if GET or POST -- returns the chat_room.html
+    """
     data = get_messages_in_chatroom(id)
     room_data = get_room_info(id)
     participant_list = get_participants_in_chat(id)
@@ -631,6 +658,14 @@ def chat_room(id):
 @app.route('/add_chat', methods=['GET', 'POST'])
 @is_logged_in
 def add_chat():
+    """
+    Allows the user to add a new chat. The name of the chat, and the
+    participants of the chat are acquired via a HTML form.
+
+    :return: if GET -- returns the add_chat.html
+             if POST -- if valid users added to chat dashboard.html
+                        if invalid users added then returns the add_chat.html
+    """
     form = ChatRoomForm(request.form)
     if request.method == 'POST' and form.validate():
         title = form.title.data
@@ -655,8 +690,6 @@ def add_chat():
                   'danger')
             return redirect(url_for('add_chat'))
 
-        return redirect(url_for('dashboard'))
-
     return render_template('add_chat.html', form=form)
 
 
@@ -664,6 +697,12 @@ def add_chat():
 @app.route('/delete_chat/<string:id>', methods=['POST'])
 @is_logged_in
 def delete_chat(id):
+    """
+    Allows the user with ID to leave the chat room
+
+    :param id: The user id
+    :return: Returns the updated dashboard.html
+    """
 
     delete_user_from_chat(session['username'], id)
 
@@ -725,7 +764,7 @@ def add_view_rules(view, view_url):
 def create_views_with_rules():
     """
     Helper function to add rules to the custom views written for the API of
-    the Free Music Database.
+    the WooMessages Database.
 
     :return: None
     """

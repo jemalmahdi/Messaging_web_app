@@ -43,7 +43,7 @@ class RegisterForm(Form):
 # Register Form Class
 class ChatRoomForm(Form):
     """
-
+    This connects
 
     Inherits from Form. See http://flask.pocoo.org/snippets/135/
     """
@@ -53,13 +53,10 @@ class ChatRoomForm(Form):
                                [validators.Length(min=4, max=250)])
 
 
-
-
 # Register Form Class
 class MessageForm(Form):
     """
 
     Inherits from Form. See http://flask.pocoo.org/snippets/135/
     """
-    message = StringField('Message',
-                        [validators.Length(min=1, max=500)])
+    message = StringField('Message', [validators.Length(min=1, max=500)])

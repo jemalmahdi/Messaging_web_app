@@ -23,7 +23,8 @@ app.config['DATABASE'] = os.path.join(app.root_path, 'WooMessages.sqlite')
 
 def init_db():
     """
-    This will initialize the database
+    This will initialize the database and create the following tables: user,
+    chat, message, chat_rel
     """
     conn = get_db()
 
@@ -68,12 +69,12 @@ def init_db():
 
 def convert_csv_to_sqlite(filename):
     """
-    Initialises a db if non-existant and populates the db with data from a CSV
+    Initialises a db if non-existent and populates the db with data from a CSV
     file.
 
-    :param filename: the CSV filename where data is stored. The data must be in
-    the columns titled Artist_Name, Artist_Age, Album_Name Track_Name and
-    Track_Duration
+    :param filename: the CSV filename where data is stored. The data must be
+    in the columns titled 'Username', 'Password', 'Name', 'Email',
+    'Chat_Title', 'Title' and 'Message'
     :return: None
     """
 
@@ -200,8 +201,8 @@ def insert_message(message, time, user_id, chat_id):
 
 def insert_chat(title, time):
     """
-    Insert a chat into the database ONLY IF a chat with the same title does not
-    already exist.
+    Insert a chat into the database ONLY IF a chat with the same title does
+    not already exist.
 
     Returns a dictionary representing the newly inserted row.
 
@@ -229,6 +230,14 @@ def insert_chat(title, time):
 
 
 def insert_chat_rel(user_id, chat_id):
+    """
+    Insert a chat relationship into the database that will link which user
+    belongs to which chat
+
+    :param user_id: ID of the user
+    :param chat_id: ID of the chat
+    :return: inserted row as a dictionary
+    """
     conn = get_db()
     cur = conn.cursor()
 
@@ -255,8 +264,7 @@ def insert_table_info(username, password, name, email,
     """
     Inserts data into tables of our database.
 
-    A helper function that inserts data for a car, along with its model,
-    store and manufacturer into the respective tables.
+    A helper function that inserts data for a users data and chat data
 
     :param username: user's username
     :param password: user's password
@@ -276,35 +284,22 @@ def insert_table_info(username, password, name, email,
     message = insert_message(message_content, message_time,
                              user['id'], chat['id'])
 
-    # if chat_id is None:
-    #
-    #
-    # chat = insert_chat(chat_title, me)
-    #
-    #
-    # artist = insert_artist(artist_name, artist_age)
-    # album = insert_album(album_name, artist["id"])
-    # insert_track(track_name, track_duration, album["id"])
-    #
-    # user_id = insert_user(row['Name'], row['Email'], row['Username'],
-    #                       row['Password'])
-    # content = user_id.json()
-    # user_id = content['username']
-    # chat_id = check_chat(row['Title'])
-    # if check_chat(row['Title']) is 0:
-    #     chat_id = insert_chat(row['Title'], row['Time'])
-    #     content = chat_id.json()
-    #     chat_id = content['id']
-    # insert_message(row['Message'], row['Time'], user_id, chat_id)
-    # insert_chat_rel(user_id, chat_id)
-
 
 def update_message(text, user_id, message_id):
+    """
+    Updates the contents of a message. Provides the ability to change the
+    user id of where the message is delivered to.
+
+    :param text: the contents of a message
+    :param user_id: ID of the message receiver
+    :param message_id: ID of the message
+    :return: dictionary containing updated message
+    """
     conn = get_db()
     cur = conn.cursor()
 
     query = '''
-        UPDATE message SET message = ? AND user_id = ? WHERE id = ?
+        UPDATE message SET message = ?, user_id = ? WHERE id = ?
     '''
 
     cur.execute(query, (text, user_id, message_id))
@@ -317,7 +312,8 @@ def update_message(text, user_id, message_id):
 
 def update_user(user_id, name):
     """
-    Wil update a username given a specific user_id
+    Updates a username given a specific user_id
+
     :param user_id: the id of the user to be updated
     :param name: the updated username
     :return: a dictionary representing the new, updated user
@@ -340,10 +336,11 @@ def update_user(user_id, name):
 
 def update_chat(chat_id, title):
     """
-    Will update a chat title given a specific chat_id
+    Updates a chat title given a specific chat_id
+
     :param chat_id: the id of the chat to be updated
     :param title: the updated chat title
-    :return: a dictionary representing the new, updated chat title
+    :return: a dictionary representing the updated chat title
     """
 
     conn = get_db()
@@ -363,10 +360,10 @@ def update_chat(chat_id, title):
 
 def delete_item(table_name, item_id):
     """
-    This function deletes items with item_id from table_name
+    This function deletes items from a table based on their item_id
 
-    :param table_name: the table which has an item to delete
-    :param item_id: it item which to delte
+    :param table_name: name of table which has an item to delete
+    :param item_id: item which to delete
     :return: NONE
     """
     conn = get_db()
@@ -382,11 +379,11 @@ def delete_item(table_name, item_id):
 
 def check_chat(title):
     """
-    THis function will only be called when filling a csv. That is to ensure
+    This function will only be called when filling a csv. That is to ensure
     that multiple chats aren't created when originally populating the database
 
     :param title: the title of a chat
-    :return: None if the chat doesn't exist. the chat id otherwise.
+    :return: None if the chat doesn't exist. Returns the chat id otherwise.
     """
 
     conn = get_db()
@@ -402,12 +399,20 @@ def check_chat(title):
     if content is not None:
         return content['id']
     else:
-        return None  # none instead of 0 cause 0 might be a chat id
+        return None  # none instead of 0 because 0 might be a chat_id
 
 
 def check_chat_rel(user_id, chat_id):
     """
+    Given a user_id and chat_id, this function returns the chat relationship
+    id of the chat that a user belongs to
 
+    Returns none if the user is not in the chat
+
+    :param user_id: ID of the user
+    :param chat_id: ID of the chat
+    :return: chat_rel_id if the given user is in a given chat, none if user
+             is not in the chat
     """
 
     conn = get_db()
@@ -427,4 +432,4 @@ def check_chat_rel(user_id, chat_id):
     if content is not None:
         return content['id']
     else:
-        return None  # none instead of 0 cause 0 might be a chat id
+        return None  # none instead of 0 because 0 might be a chat id
