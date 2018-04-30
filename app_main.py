@@ -420,10 +420,8 @@ from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from functools import wraps
 import os
 
-from login_source import *
 from custom_views import *
 from database import *
-from Social_Media import *
 from exception_classes import *
 from queries import *
 from custom_forms import *
