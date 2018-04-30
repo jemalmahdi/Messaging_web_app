@@ -46,6 +46,8 @@ class Message:
         return self._chat
 
 
+
+
 class Chat:
     """
     An object from this class represents a chat. In particular it stores the
