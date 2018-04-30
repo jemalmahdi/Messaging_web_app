@@ -30,3 +30,7 @@ AND chat_rel.chat_id = chat.id
 AND message.user_id = user.id
 AND message.chat_id = chat.id
 ORDER BY chat.title, message.time;
+
+.print chatrooms
+SELECT chat.title AS "Chat room"
+FROM chat;

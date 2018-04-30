@@ -1,5 +1,10 @@
 """
-CS232
+WooMessages
+CS 232
+Final Project
+AVI VAJPEYI, JEMAL JEMAL, ISAAC WEISS, MORGAN THOMPSON
+
+
 
 A file containing the declarations and definitions of custom MethodViews.
 There are three customMethodViews: ArtistView, AlbumView and TrackView.
@@ -11,7 +16,6 @@ from flask import Flask, g, jsonify
 from queries import *
 from exception_classes import *
 from database import *
-
 
 
 class ChatRelView(MethodView):
@@ -93,7 +97,7 @@ class ChatRelView(MethodView):
                 chat = query_by_id('chat_rel', id)
 
                 if chat is not None:
-                    #Need new function
+                    # Need new function
                     update_user(id, request.form['user_id'])
                 else:
                     raise RequestError(404, 'chat not found')
@@ -117,7 +121,7 @@ class ChatRelView(MethodView):
                 chat = query_by_id('chat_rel', chatrel_id)
 
                 if chat is not None:
-                    #Need new function
+                    # Need new function
                     update_user(chatrel_id, request.form['user_id'])
                 else:
                     raise RequestError(404, 'chat not found')
@@ -206,7 +210,8 @@ class MessageView(MethodView):
                 message = query_by_id('message', id)
 
                 if message is not None:
-                    update_message()
+                    update_message(request.form['message'],
+                                   request.form['user_id'], id)
                 else:
                     raise RequestError(404, 'message not found')
 
@@ -401,7 +406,7 @@ class ChatView(MethodView):
         else:
             response = jsonify(insert_chat(request.form['title'],
                                            request.form['time']))
-            #FIND SOMETHING THAT WORKS HERE
+            # FIND SOMETHING THAT WORKS HERE
             # response = jsonify(insert_message(request.form['text'], user_id))
         return response
 
@@ -423,3 +428,26 @@ class ChatView(MethodView):
             else:
                 raise RequestError(404, 'chat not found')
         return jsonify(chat)
+
+    def put(self, id):
+        """
+        Handles a PUT request given a certain chat_id
+        :param id: the id of the chat
+        :return:a response containing the JSON representation of the
+            new chat
+        """
+
+        if id is None:
+            raise RequestError(422, 'Chat Id is required')
+        else:
+            if 'title' not in request.form:
+                raise RequestError(422, 'Chat title is required')
+            else:
+                chat = query_by_id('chat', id)
+
+                if chat is not None:
+                    update_chat(id, request.form['title'])
+                else:
+                    raise RequestError(404, 'chat not found')
+                user = query_by_id('chat', id)
+                return jsonify(user)

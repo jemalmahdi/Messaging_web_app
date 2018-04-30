@@ -2,8 +2,6 @@
 WooMessages
 CS 232
 Final Project
-
-
 AVI VAJPEYI, JEMAL JEMAL, ISAAC WEISS, MORGAN THOMPSON
 
 This Flask app allows a user to interact with a music artist database in a
@@ -17,24 +15,26 @@ $ pip install WTForms
 $ pip install tabulate
 $ pip install flask_login
 $ pip install passlib
+$ pip install pytest
 $ export FLASK_APP=app_main.py
 $ flask run
 
 *******************************************************************************
 A general description of the WooMessage API is as follows.
 
-There are three types of resources: Artists, Albums, Tracks
+There are two types of resources: user, chat
 
---ARTISTS
-An artist resource is an individual musical artist.
+--USER
+An user resource is an individual user.
 
     Attributes:
+    email string -- The email of the user
     id int -- The unique number to represent this resource.
     name string -- The name of the artist.
-    age int -- The age of the artist.
+    password string --
+    username string --
 
-
-GET /artist
+GET /user
 
 Description:
 Get a list of all artists
@@ -46,14 +46,18 @@ Example usage:
 $ curl -X GET http://127.0.0.1:5000/artists/
 [
   {
-        "id": 1,
-        "name": Bob,
-        "age": 80,
+    "email": "JJemal20@wooster.edu",
+    "id": 1,
+    "name": "Jemal",
+    "password": "$5$rounds=535000$oBWsPrEhsccUSqEH$ut/SZIwokcxcNFHlrX/cEu5AIl2iUm4wWIClyi8bCt.",
+    "username": "JemalMahdi"
   },
   {
-        "id": 1,
-        "name": Bobbie,
-        "age": 8,
+    "email": "Avajpai18@wooster.edu",
+    "id": 2,
+    "name": "Avi",
+    "password": "$5$rounds=535000$68DCPBEA.GfYxWWD$eiN6GrnZWEUyz0XFCj27G/XqwpCGUBA/dJRJi5JSBbC",
+    "username": "AviVajpeyi"
   }
 ]
 
@@ -408,7 +412,8 @@ import click
 from flask import *
 from flask.ext.login import LoginManager, UserMixin, \
                                 login_required, login_user, logout_user
-from passlib.hash import sha256_crypt # a hash algorithm that encrypts password
+# a hash algorithm that encrypts password
+from passlib.hash import sha256_crypt
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from functools import wraps
 import os
@@ -419,6 +424,7 @@ from database import *
 from Social_Media import *
 from exception_classes import *
 from queries import *
+from custom_forms import *
 import tabulate
 
 
@@ -447,7 +453,7 @@ def initdb_command():
 @click.argument('filename')
 def convert_csv_to_sqlite_command(filename):
     convert_csv_to_sqlite(filename)
-    print('Inserted' + filename)
+    print('Inserted ' + filename)
 
 
 @login_manager.user_loader
@@ -482,14 +488,13 @@ def register():
                     username=form.username.data,
                     password=form.password.data)
 
-
         # Flash a message to the HTML cause we just registered babbyyyyyy
         flash('Congratulations! You have sold your soul to WooMessages! Next '
               'time, read terms and conditions. Proceed to Login.', 'success')
 
         # now that registered, send to login site
         return redirect(url_for('login'))
-    return render_template('RegisterationPage.html', form=form) # default GET
+    return render_template('RegisterationPage.html', form=form)  # default GET
 
 
 # User login
@@ -576,29 +581,100 @@ def dashboard():
 
     :return:
     """
-    # Create cursor
-    # conn = get_db()
-    # cur = conn.cursor()
-    #
-    # # Get user's active chats
-    # cur.execute('SELECT chat.name FROM user, chat WHERE user.id = chat.user_id AND username = ?', (username,))
-    # data = cur.fetchall()
-    # num_rows = len(data)
-    #
-    # # Get list of active messages from chat rel [FETCHALL]
-    # data = cur.fetchall()
-    # num_rows = len(data)
 
-    data = None
+    data = get_chat_rooms(get_user_id(session['username']))
+
+    # data = get_chat_rooms(get_user_id(session['username']))
+
     num_rows = 0
+    if data is not None:
+        num_rows = 1
 
     if num_rows > 0:
-        return render_template('dashboard.html', active_chats=data)
+        return render_template('dashboard.html', chats=data)
     else:
         msg = 'No active chats'
         return render_template('dashboard.html', msg=msg)
     # Close connection
     cur.close()
+
+
+##############################################################################
+
+
+# Single chat room
+@app.route('/chat_room/<string:id>/', methods=['GET', 'POST'])
+def chat_room(id):
+    data = get_messages_in_chatroom(id)
+    room_data = get_room_info(id)
+    participant_list = get_participants_in_chat(id)
+    participant_str = ", ".join(str(participant) for
+                                participant in participant_list)
+
+    form = MessageForm(request.form)
+    if request.method == 'POST' and form.validate():
+        insert_message(message=form.message.data,
+                       time=get_date(),
+                       user_id=get_user_id(session['username']),
+                       chat_id=id)
+
+        data = get_messages_in_chatroom(id)
+
+        return render_template('chat_room.html', names=participant_str,
+                               room=room_data, chat_room=data, form=form)
+
+    return render_template('chat_room.html', names=participant_str,
+                           room=room_data, chat_room=data, form=form)
+
+
+# Add chat room
+@app.route('/add_chat', methods=['GET', 'POST'])
+@is_logged_in
+def add_chat():
+    form = ChatRoomForm(request.form)
+    if request.method == 'POST' and form.validate():
+        title = form.title.data
+        participants = form.participants.data
+        participant_list = participants.split(",")
+        participant_list[:] = [p.replace(' ', '') for p in participant_list]
+
+        # user creating the chat must be in the chat
+        participant_list.append(session['username'])
+
+        result = insert_chat_room(title, participant_list)
+        result_status = str(result).isdigit()
+
+        if result_status:
+            flash('Chat room \"{}\" created!'.
+                  format(str(get_chat_room_name(result))),
+                  'success')
+            return redirect(url_for('dashboard'))
+        else:
+            flash('User \"{}\" does not exist. '
+                  'Could not create chat.'.format(str(result)),
+                  'danger')
+            return redirect(url_for('add_chat'))
+
+        return redirect(url_for('dashboard'))
+
+    return render_template('add_chat.html', form=form)
+
+
+# Delete chat room
+@app.route('/delete_chat/<string:id>', methods=['POST'])
+@is_logged_in
+def delete_chat(id):
+
+    delete_user_from_chat(session['username'], id)
+
+    chat_name = get_chat_room_name(id)
+
+    flash('You have left the chat \"{}\"'.format(chat_name), 'success')
+
+    return redirect(url_for('dashboard'))
+
+
+##############################################################################
 
 @app.errorhandler(RequestError)
 def handle_invalid_usage(error):
@@ -669,5 +745,5 @@ def create_views_with_rules():
 create_views_with_rules()
 
 if __name__ == "__main__":
-    app.secret_key='thisissecret'
+    app.secret_key = 'thisissecret'
     app.run(debug=True)

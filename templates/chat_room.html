@@ -1,0 +1,34 @@
+{% extends 'layout.html' %}
+<meta http-equiv="refresh" content="5" >
+{% block body %}
+  {% for title, date in room %}
+    <h1>{{title}}</h1>
+    <small>Created on {{date}}</small>
+  {% endfor %}
+  <div>
+    <p>Participants in chat: {{names}}</p>
+  </div>
+  <hr>
+  <div>
+    <table class="table table-striped">
+    <tr>
+      <th>User</th>
+      <th>Message</th>
+      <th>Date</th>
+    </tr>
+    {% for user, message, date in chat_room %}
+      <tr>
+        <td>{{user}}</td>
+        <td>{{message}}</td>
+        <td>{{date}}</td>
+      </tr>
+    {% endfor %}
+  </table>
+  </div>
+  <form action="" method="POST">
+    <div class="form-group">
+      <input type="text" name="message" class="form-control" value={{request.form.message}}>
+    </div>
+    <button type="submit" class="btn btn-primary">Send</button>
+  </form>
+{% endblock %}
