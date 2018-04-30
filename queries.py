@@ -331,3 +331,22 @@ def delete_user_from_chat(username, chat_id):
     cur.execute('DELETE FROM chat_rel WHERE user_id = ? AND chat_id = ?',
                 (user_id, chat_id))
     conn.commit()
+
+
+def delete_item(table_name, item_id):
+    """
+    This function deletes items with item_id from table_name
+
+    :param table_name: the table which has an item to delete
+    :param item_id: it item which to delte
+    :return: NONE
+    """
+    conn = get_db()
+    cur = conn.cursor()
+
+    query = 'DELETE FROM {} WHERE id = ?'.format(table_name)
+
+    cur.execute(query, (item_id,))
+    conn.commit()
+
+    return None
