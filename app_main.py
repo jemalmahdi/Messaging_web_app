@@ -604,6 +604,7 @@ def dashboard():
 
 # Single chat room
 @app.route('/chat_room/<string:id>/', methods=['GET', 'POST'])
+@is_logged_in
 def chat_room(id):
     data = get_messages_in_chatroom(id)
     room_data = get_room_info(id)
