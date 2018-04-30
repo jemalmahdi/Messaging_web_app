@@ -1,8 +1,8 @@
 
 class Message:
     """
-    An object from this class represents a dog. In particular it stores the
-    name, age, and breed.
+    An object from this class represents a message. In particular it stores the
+    message content, the user sender, the time and chat the message is sent to.
     """
 
     def __init__(self, message, time, chat, user):
@@ -10,10 +10,10 @@ class Message:
         Construct a Message object using its message content,
         the sender user, and the chat and time the message is sent.
 
-        :param message: message 
-        :param time: age of the dog
-        :param chat: breed of the dog
-        :param user:
+        :param message: message content being sent
+        :param time: time the message is sent
+        :param chat: chat the message is sent in
+        :param user: the user sending the message
         """
         self._message = message
         self._time = time
@@ -22,28 +22,28 @@ class Message:
 
     def __repr__(self):
         """
-        Create a string representation of a dog.
+        Create a string representation of a message.
 
         The format is as follows:
 
-           <name>, a <age> year old <breed>
+           <user>: "<message>" @ <time> in <chat>
 
-        :return: the string representation of the dog
+        :return: the string representation of the message
         """
-        return '{}, a {} year old {}'.format(self._name, self._age,
-                                             self._breed)
+        return '{}: \"{}\" @ {} in {}'.format(self._user, self._message,
+                                              self._time, self._chat)
 
-    def get_name(self):
-        return self._name
+    def get_user(self):
+        return self._user
 
-    def get_age(self):
-        return self._age
+    def get_message(self):
+        return self._message
 
-    def increment_age(self):
-        self._age += 1
+    def get_time(self):
+        return self._time
 
-    def get_breed(self):
-        return self._breed
+    def get_chat(self):
+        return self._chat
 
 
 
@@ -84,7 +84,53 @@ class Chat:
 
 
 
+
+
 class User:
+    """
+    An object from this class represents a user. In particular it stores the
+    name, email, username and password (ENRYPTED) of the user.
+    """
+
+    def __init__(self, name, email, username, password):
+        """
+        Construct a User object using its name, email, username, password.
+
+        :param name: name of the user
+        :param email: email of the user
+        :param username: unique username of the user
+        :param password: the password of the user
+        """
+        self._name = name
+        self._email = email
+        self._username = username
+        self._password = password
+
+    def __repr__(self):
+        """
+        Create a string representation of a user.
+
+        The format is as follows:
+
+           <username>: <name> whose email is <email> and password is <password>
+
+        :return: the string representation of the user
+        """
+        return '<username>: <name> whose email is <email>' \
+               ' and password is <password>'.format(self._username, self._name,
+                                              self._email, self._password)
+
+    def get_username(self):
+        return self._username
+
+    def get_name(self):
+        return self._name
+
+    def get_email(self):
+        return self._email
+
+    def get_password(self):
+        return self._password
 
 
 class ChatRel:
