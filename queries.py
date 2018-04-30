@@ -4,7 +4,7 @@ CS 232
 Final Project
 AVI VAJPEYI, JEMAL JEMAL, ISAAC WEISS, MORGAN THOMPSON
 
-A file containing functions for quering the WooMessages database.
+A file containing functions for querying the WooMessages database.
 """
 
 from database import *
@@ -20,7 +20,7 @@ def query_by_id(table_name, item_id):
 
     :param table_name: name of the table to query
     :param item_id: id of the row
-    :return: a dictionary representing the row
+    :return: a dictionary representing the row, and None if there is no row
     """
     conn = get_db()
     cur = conn.cursor()
@@ -61,10 +61,10 @@ def get_all_rows(table_name):
 
 def get_user_by_username(username):
     """
-    Returns a dictionary of one user
+    Returns a dictionary of one user's details
 
     :param username: the username of the user being searched for
-    :return: a dictionary of the user
+    :return: a dictionary of the user's details
     """
     # Create cursor
     conn = get_db()
@@ -75,16 +75,14 @@ def get_user_by_username(username):
     results = cur.fetchall()
 
     if len(results) > 0:
-        print("get_user_by_username(username)")
-        print(results[0]['username'])
         return dict(results[0])
     else:
-        return None # if none flash red
+        return None  # if none flash red on the HTML
 
 
 def get_user_id(username):
     """
-    gets the user_id based off of their unique username
+    Gets the user_id of a user from the username that is passed
 
     :param username: the username of the user to get their id
     :return: the id of the user, or a request error if user doesn't exist
@@ -124,8 +122,8 @@ def get_messages_in_chatroom(chat_id):
         SELECT user.name AS "name", message.message AS "message",
         message.time AS "time", chat.title AS "title", chat.time AS "created"
         FROM user, message, chat
-        WHERE chat.id = ? AND message.chat_id = ? AND user.id = message.user_id
-        ORDER BY time
+        WHERE chat.id = ? AND message.chat_id = ? AND
+        user.id = message.user_id ORDER BY time
     '''
 
     for row in cur.execute(query, (chat_id, chat_id)):
@@ -144,10 +142,10 @@ def get_messages_in_chatroom(chat_id):
 
 def get_chat_room_name(chat_id):
     """
-    A function that finds the name of a chat room given a specific id
+    This function finds the name of a chat room given a specific chat id
 
-    :param chat_id: the id of a chat
-    :return: the name of the chatroom
+    :param chat_id: ID of a chat
+    :return: name of the chat room
     """
 
     conn = get_db()
@@ -171,10 +169,9 @@ def get_chat_room_name(chat_id):
 
 def get_chat_rooms(user_id):
     """
-    gets all of the chat rooms that a user is in
+    Gets all of the chat rooms that a user is a part of
 
-    :param user_id: the id of the user with which to query to get all of the
-        chat rooms
+    :param user_id: ID of the user
     :return: an ordered dictionary containing the chat rooms
     """
 
@@ -208,9 +205,9 @@ def get_chat_rooms(user_id):
 
 def get_participants_in_chat(chat_id):
     """
-    A function that will return an ordered dictionary of participants in a chat
+    A function that returns an ordered dictionary of participants in a chat
 
-    :param chat_id: the id of the chat to find participants in
+    :param chat_id: ID of a chat
     :return: an ordered dictionary of participants
     """
 
@@ -238,10 +235,10 @@ def get_participants_in_chat(chat_id):
 
 def get_room_info(chatroom_id):
     """
-    Will get the title and time of creation for a chatroom based off of an id
+    Gets the title and time of creation for a chat room based on a chatroom_id
 
-    :param chatroom_id: the id of the chatroom to collect info for
-    :return: an ordered dictionary of the chatroom information
+    :param chatroom_id: ID of the chat room to collect info for
+    :return: an ordered dictionary of the chat room information
     """
 
     conn = get_db()
@@ -287,11 +284,11 @@ def delete_user_from_chat(username, chat_id):
 
 def insert_chat_room(title, username_list):
     """
-    will take information from the HTML to create a new chatroom
+    Takes information from the HTML to create a new chat room
 
     :param title: the title of the chat
-    :param username_list: a list of usernames to be added
-    :return: null
+    :param username_list: a list of username's to be added
+    :return: ID of the chat room
     """
 
     # check if all users are valid users

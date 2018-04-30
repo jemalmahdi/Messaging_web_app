@@ -7,6 +7,7 @@ AVI VAJPEYI, JEMAL JEMAL, ISAAC WEISS, MORGAN THOMPSON
 """
 from flask import jsonify
 
+
 # START: Taken from homework 18
 class RequestError(Exception):
     """
@@ -23,9 +24,4 @@ class RequestError(Exception):
         response = jsonify({'error': self.error_message})
         response.status = self.status_code
         return response
-
-
-
-
-
 # END: Taken from homework 18
