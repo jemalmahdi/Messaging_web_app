@@ -2,8 +2,6 @@
 WooMessages
 CS 232
 Final Project
-
-
 AVI VAJPEYI, JEMAL JEMAL, ISAAC WEISS, MORGAN THOMPSON
 
 """
@@ -21,23 +19,31 @@ class RegisterForm(Form):
     Inherits from Form. See http://flask.pocoo.org/snippets/135/
     """
     name = StringField('Name',
-                       [validators.Length(min=1, max=50)])
+                       [validators.Length(min=1, max=50),
+                        validators.DataRequired()])
+
     username = StringField('Username',
-                           [validators.Length(min=4, max=25)])
+                           [validators.Length(min=4, max=25),
+                            validators.DataRequired()])
+
     email = StringField('Email',
-                        [validators.Length(min=6, max=50)])
+                        [validators.Length(min=6, max=50),
+                         validators.DataRequired(),
+                         validators.Email()])
+
     password = PasswordField('Password',
                              [validators.DataRequired(),
                               validators.EqualTo('confirm',
-                                                 message='Incorrect Password')
-                              ])
+                                                 message='Incorrect Password'),
+                              validators.DataRequired()])
+
     confirm = PasswordField('Confirm Password')
 
 
 # Register Form Class
 class ChatRoomForm(Form):
     """
-
+    This connects
 
     Inherits from Form. See http://flask.pocoo.org/snippets/135/
     """
@@ -47,13 +53,10 @@ class ChatRoomForm(Form):
                                [validators.Length(min=4, max=250)])
 
 
-
-
 # Register Form Class
 class MessageForm(Form):
     """
 
     Inherits from Form. See http://flask.pocoo.org/snippets/135/
     """
-    message = StringField('Message',
-                        [validators.Length(min=1, max=500)])
+    message = StringField('Message', [validators.Length(min=1, max=500)])
