@@ -300,7 +300,7 @@ def update_message(text, user_id, message_id):
     cur = conn.cursor()
 
     query = '''
-        UPDATE message SET text = ? AND user_id = ? WHERE id = ?
+        UPDATE message SET message = ? AND user_id = ? WHERE id = ?
     '''
 
     cur.execute(query, (text, user_id, message_id))
@@ -330,6 +330,29 @@ def update_user(user_id, name):
     conn.commit()
 
     cur.execute('SELECT * FROM user WHERE id = ?', (user_id,))
+
+    return dict(cur.fetchone())
+
+
+def update_chat(chat_id, title):
+    """
+    Will update a chat title given a specific chat_id
+    :param chat_id: the id of the chat to be updated
+    :param title: the updated chat title
+    :return: a dictionary representing the new, updated chat title
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    query = '''
+        UPDATE chat SET title = ? WHERE id = ?
+    '''
+
+    cur.execute(query, (title, chat_id))
+    conn.commit()
+
+    cur.execute('SELECT * FROM chat WHERE id = ?', (chat_id,))
 
     return dict(cur.fetchone())
 

@@ -638,9 +638,11 @@ def add_chat():
         participant_list.append(session['username'])
 
         result = insert_chat_room(title, participant_list)
+        result_status = str(result).isdigit()
 
-        if result.isdigit():
-            flash('Chat room \"{}\" created!'.format(get_chat_room_name(id)),
+        if result_status:
+            flash('Chat room \"{}\" created!'.
+                  format(str(get_chat_room_name(result))),
                   'success')
             return redirect(url_for('dashboard'))
         else:

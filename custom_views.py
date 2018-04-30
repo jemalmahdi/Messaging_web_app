@@ -1,5 +1,10 @@
 """
-CS232
+WooMessages
+CS 232
+Final Project
+
+
+AVI VAJPEYI, JEMAL JEMAL, ISAAC WEISS, MORGAN THOMPSON
 
 A file containing the declarations and definitions of custom MethodViews.
 There are three customMethodViews: ArtistView, AlbumView and TrackView.
@@ -205,7 +210,8 @@ class MessageView(MethodView):
                 message = query_by_id('message', id)
 
                 if message is not None:
-                    update_message()
+                    update_message(request.form['message'],
+                                   request.form['user_id'], id)
                 else:
                     raise RequestError(404, 'message not found')
 
@@ -423,66 +429,25 @@ class ChatView(MethodView):
                 raise RequestError(404, 'chat not found')
         return jsonify(chat)
 
+    def put(self, id):
+        """
+        Handles a PUT request given a certain chat_id
+        :param id: the id of the chat
+        :return:a response containing the JSON representation of the
+            new chat
+        """
 
-# Register MessageView as the handler for all the /message/ requests.
-message_view = MessageView.as_view('message_view')
-app.add_url_rule('/api/message/', defaults={'message_id': None},
-                 view_func=message_view, methods=['GET'])
-app.add_url_rule('/api/message/', view_func=message_view,
-                 methods=['POST'])
-# For this you would need to provide the user_id through the form data. URL
-# values are only for message ID -Morgan
-# app.add_url_rule('/message/<int:user_id>', view_func=message_view,
-#                  methods=['POST'])  # Hey, should this be message? or POST
-app.add_url_rule('/api/message/<int:message_id>', view_func=message_view,
-                 methods=['GET'])
-app.add_url_rule('/api/message/<int:message_id>', view_func=message_view,
-                 methods=['DELETE'])
-app.add_url_rule('/api/message/<int:message_id>', view_func=message_view,
-                 methods=['PUT'])
-app.add_url_rule('/api/message/<int:message_id>', view_func=message_view,
-                 methods=['PATCH'])
+        if id is None:
+            raise RequestError(422, 'Chat Id is required')
+        else:
+            if 'title' not in request.form:
+                raise RequestError(422, 'Chat title is required')
+            else:
+                chat = query_by_id('chat', id)
 
-
-# Register UserView as the handler for all the /user/ requests.
-user_view = UserView.as_view('user_view')
-app.add_url_rule('/api/user/', defaults={'user_id': None},
-                 view_func=user_view, methods=['GET'])
-app.add_url_rule('/api/user', view_func=user_view,
-                 methods=['POST'])
-app.add_url_rule('/api/user/<int:user_id>', view_func=user_view,
-                 methods=['GET'])
-app.add_url_rule('/api/user/<int:user_id>', view_func=user_view,
-                 methods=['DELETE'])
-app.add_url_rule('/api/user/<int:user_id>', view_func=user_view,
-                 methods=['PUT'])
-app.add_url_rule('/api/user/<int:user_id>', view_func=user_view,
-                 methods=['PATCH'])
-
-
-# Register ChatView as the handler for all the /chat/ requests.
-chat_view = ChatView.as_view('chat_view')
-app.add_url_rule('/api/chat/', defaults={'chat_id': None},
-                 view_func=chat_view, methods=['GET'])
-app.add_url_rule('/api/chat/', view_func=chat_view,
-                 methods=['POST'])
-app.add_url_rule('/api/chat/<int:user_id>', view_func=chat_view,
-                 methods=['GET'])
-app.add_url_rule('/api/chat/<int:chat_id>', view_func=chat_view,
-                 methods=['DELETE'])
-
-
-# Register ChatRelView as the handler for all the /login/ requests.
-chatrel_view = ChatRelView.as_view('chatrel_view')
-app.add_url_rule('/chatrel/', defaults={'chatrel_id': None},
-                 view_func=chatrel_view, methods=['GET'])
-app.add_url_rule('/chatrel/', view_func=chatrel_view,
-                 methods=['POST'])
-app.add_url_rule('/chatrel/<int:chatrel_id>', view_func=chatrel_view,
-                 methods=['GET'])
-app.add_url_rule('/chatrel/<int:chatrel_id>', view_func=chatrel_view,
-                 methods=['DELETE'])
-app.add_url_rule('/chatrel/<int:chatrel_id>', view_func=chatrel_view,
-                 methods=['PUT'])
-app.add_url_rule('/chatrel/<int:chatrel_id>', view_func=chatrel_view,
-                 methods=['PATCH'])
+                if chat is not None:
+                    update_chat(id, request.form['title'])
+                else:
+                    raise RequestError(404, 'chat not found')
+                user = query_by_id('chat', id)
+                return jsonify(user)
