@@ -1,4 +1,9 @@
 """
+WooMessages
+CS 232
+Final Project
+AVI VAJPEYI, JEMAL JEMAL, ISAAC WEISS, MORGAN THOMPSON
+
 A file containing functions for quering the WooMessages database.
 """
 
@@ -290,7 +295,7 @@ def insert_chat_room(title, username_list):
     """
 
     # check if all users are valid users
-    verified_user  = []
+    verified_user = []
     for username in username_list:
         search_result = get_user_by_username(username)
         if search_result is not None:

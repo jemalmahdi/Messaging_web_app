@@ -1,4 +1,8 @@
 """
+WooMessages
+CS 232
+Final Project
+AVI VAJPEYI, JEMAL JEMAL, ISAAC WEISS, MORGAN THOMPSON
 
 A file containing functions for database creation and the functions required
 for updating/inserting/deleting from the database's tables.
@@ -300,7 +304,7 @@ def update_message(text, user_id, message_id):
     cur = conn.cursor()
 
     query = '''
-        UPDATE message SET text = ? AND user_id = ? WHERE id = ?
+        UPDATE message SET message = ? AND user_id = ? WHERE id = ?
     '''
 
     cur.execute(query, (text, user_id, message_id))

@@ -1,3 +1,11 @@
+"""
+WooMessages
+CS 232
+Final Project
+AVI VAJPEYI, JEMAL JEMAL, ISAAC WEISS, MORGAN THOMPSON
+
+"""
+
 import json
 from passlib.hash import sha256_crypt
 
@@ -447,7 +455,7 @@ def put(test_client, data):
                                    response_json['password'])
         expected_values['password'] = response_json['password']
 
-    # checks that the data in the response is as expected
+    # # checks that the data in the response is as expected
     assert check_values(expected_values, response_json)
 
     # executes a GET request
@@ -462,3 +470,5 @@ def put(test_client, data):
     response = test_client.put(api_path+str(id_out_of_bounds),
                                data=user_complete)
     assert response.status_code == 404
+
+
