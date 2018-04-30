@@ -37,7 +37,7 @@ class RegisterForm(Form):
 # Register Form Class
 class ChatRoomForm(Form):
     """
-
+    This connects
 
     Inherits from Form. See http://flask.pocoo.org/snippets/135/
     """
