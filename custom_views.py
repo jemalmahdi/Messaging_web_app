@@ -210,12 +210,12 @@ class MessageView(MethodView):
                 message = query_by_id('message', id)
 
                 if message is not None:
-                    update_message(request.form['message'],
-                                   request.form['user_id'], id)
+                    message = update_message(request.form['message'],
+                                             request.form['user_id'], id)
                 else:
                     raise RequestError(404, 'message not found')
 
-                message = query_by_id('message', id)
+                # message = query_by_id('message', id)
                 return jsonify(message)
 
     def patch(self, message_id):
