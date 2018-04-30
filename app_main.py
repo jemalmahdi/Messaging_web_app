@@ -49,14 +49,16 @@ $ curl -X GET http://127.0.0.1:5000/artists/
     "email": "JJemal20@wooster.edu",
     "id": 1,
     "name": "Jemal",
-    "password": "$5$rounds=535000$oBWsPrEhsccUSqEH$ut/SZIwokcxcNFHlrX/cEu5AIl2iUm4wWIClyi8bCt.",
+    "password": "$5$rounds=535000$oBWsPrEhsccUSqEH$ut/SZIwokcxcNFHlrX/
+                cEu5AIl2iUm4wWIClyi8bCt.",
     "username": "JemalMahdi"
   },
   {
     "email": "Avajpai18@wooster.edu",
     "id": 2,
     "name": "Avi",
-    "password": "$5$rounds=535000$68DCPBEA.GfYxWWD$eiN6GrnZWEUyz0XFCj27G/XqwpCGUBA/dJRJi5JSBbC",
+    "password": "$5$rounds=535000$68DCPBEA.GfYxWWD$eiN6GrnZWEUyz0XFCj27G/
+                XqwpCGUBA/dJRJi5JSBbC",
     "username": "AviVajpeyi"
   }
 ]

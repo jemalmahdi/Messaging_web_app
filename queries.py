@@ -80,7 +80,6 @@ def get_user_by_username(username):
         return None  # if none flash red on the HTML
 
 
-
 def get_user_id(username):
     """
     Gets the user_id of a user from the username that is passed
