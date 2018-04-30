@@ -687,6 +687,37 @@ def handle_invalid_usage(error):
     return error.to_response()
 
 
+class User(UserMixin):
+    """
+    Inherits from UserMixin that implments:
+
+    1) is_authenticated(self): Checks if user is authenticated (has provided
+    valid credentials).
+
+    2) is_active(self):
+
+    3) is_anonymous(self):
+
+    4) get_id(self):
+    return
+
+    """
+
+    def __init__(self, id):
+        """
+        Constructor for user object.
+        """
+        self.id = id
+        self.name = "user" + str(id)
+        self.password = self.name + "_secret"
+
+    def __repr__(self):
+        """
+        Overloading print function for User Objects.
+        """
+        return "%d/%s/%s" % (self.id, self.name, self.password)
+
+
 def add_view_rules(view, view_url):
     """
     Adds rules to a custom MethodView. Preconditions are that the custom
