@@ -299,7 +299,7 @@ def update_message(text, user_id, message_id):
     cur = conn.cursor()
 
     query = '''
-        UPDATE message SET message = ? AND user_id = ? WHERE id = ?
+        UPDATE message SET message = ?, user_id = ? WHERE id = ?
     '''
 
     cur.execute(query, (text, user_id, message_id))

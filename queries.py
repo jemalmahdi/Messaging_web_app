@@ -80,6 +80,7 @@ def get_user_by_username(username):
         return None  # if none flash red on the HTML
 
 
+
 def get_user_id(username):
     """
     Gets the user_id of a user from the username that is passed
@@ -307,3 +308,41 @@ def insert_chat_room(title, username_list):
         insert_chat_rel(get_user_id(username), chat_id)
 
     return chat_id  # no error!
+
+
+def delete_user_from_chat(username, chat_id):
+    """
+    This function removes a user from a chat. If there are no users in a chat,
+    the chat will also be deleted.
+
+    :param username: the username of the user to be deleted
+    :param chat_id: the id of the chat
+    """
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    user_id = get_user_id(username)
+
+    cur.execute('DELETE FROM chat_rel WHERE user_id = ? AND chat_id = ?',
+                (user_id, chat_id))
+    conn.commit()
+
+
+def delete_item(table_name, item_id):
+    """
+    This function deletes items with item_id from table_name
+
+    :param table_name: the table which has an item to delete
+    :param item_id: it item which to delte
+    :return: NONE
+    """
+    conn = get_db()
+    cur = conn.cursor()
+
+    query = 'DELETE FROM {} WHERE id = ?'.format(table_name)
+
+    cur.execute(query, (item_id,))
+    conn.commit()
+
+    return None
