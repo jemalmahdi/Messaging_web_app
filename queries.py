@@ -79,7 +79,7 @@ def get_user_by_username(username):
         print(results[0]['username'])
         return dict(results[0])
     else:
-        return None # if none flash red
+        return None  # if none flash red
 
 
 def get_user_id(username):
