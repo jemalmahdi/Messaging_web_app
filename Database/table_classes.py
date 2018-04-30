@@ -46,7 +46,6 @@ class Message:
         return self._chat
 
 
-
 class Chat:
     """
     An object from this class represents a chat. In particular it stores the
@@ -80,10 +79,6 @@ class Chat:
 
     def get_time(self):
         return self._time
-
-
-
-
 
 
 class User:
@@ -166,3 +161,4 @@ class ChatRel:
 
     def get_chat_id(self):
         return self._chat
+    
