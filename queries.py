@@ -81,7 +81,7 @@ def get_user_by_username(username):
         print(results[0]['username'])
         return dict(results[0])
     else:
-        return None # if none flash red
+        return None  # if none flash red
 
 
 def get_user_id(username):
@@ -297,7 +297,7 @@ def insert_chat_room(title, username_list):
     """
 
     # check if all users are valid users
-    verified_user  = []
+    verified_user = []
     for username in username_list:
         search_result = get_user_by_username(username)
         if search_result is not None:
