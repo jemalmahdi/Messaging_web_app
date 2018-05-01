@@ -61,21 +61,21 @@ class ChatRelView(MethodView):
                                                request.form['chat_id']))
         return response
 
-    def delete(self, chatrel_id):
+    def delete(self, id):
         """
         Handles a DELETE request given a certain login_id
-        :param login_id: the id of the login to delete
+        :param id: the id of the login to delete
         :return: a response containing the JSON representation of the
             old login
         """
 
-        if chatrel_id is None:
+        if id is None:
             raise RequestError(422, 'chatrel_id required')
         else:
-            chat = query_by_id('chat_rel', chatrel_id)
+            chat = query_by_id('chat_rel', id)
 
             if chat is not None:
-                delete_item('chat_rel', chatrel_id)
+                delete_item('chat_rel', id)
             else:
                 raise RequestError(404, 'Chat rel not found')
         return jsonify(chat)
@@ -177,20 +177,20 @@ class MessageView(MethodView):
                                               request.form['chat_id']))
         return response
 
-    def delete(self, message_id):
+    def delete(self, id):
         """
         Handles a DELETE request given a certain message_id
         :return: a response containing the JSON representation of the
             old message
         """
 
-        if message_id is None:
+        if id is None:
             raise RequestError(422, 'message id required')
         else:
-            messages = query_by_id('message', message_id)
+            messages = query_by_id('message', id)
 
             if messages is not None:
-                delete_item('message', message_id)
+                delete_item('message', id)
             else:
                 raise RequestError(404, 'message not found')
         return jsonify(messages)
@@ -226,18 +226,18 @@ class MessageView(MethodView):
                 # message = query_by_id('message', id)
                 return jsonify(message)
 
-    def patch(self, message_id):
+    def patch(self, id):
         """
         Handles the PATCH request given a certain message_id
-        :param message_id: the id of the message to be patched
+        :param id: the id of the message to be patched
         :return:a response containing the JSON representation of the
-            old message
+        old message
         """
 
-        if message_id is None:
+        if id is None:
             raise RequestError(422, 'message id is required')
         else:
-            messages = query_by_id('message', message_id)
+            messages = query_by_id('message', id)
 
             if messages is None:
                 raise RequestError(404, 'message not found')
@@ -251,8 +251,8 @@ class MessageView(MethodView):
                 if 'user' in request.form:
                     new_user = request.form['user']
 
-                update_message(message_id, new_text, new_user)
-                messages = query_by_id('messages', message_id)
+                update_message(id, new_text, new_user)
+                messages = query_by_id('messages', id)
                 return jsonify(messages)
 
 
@@ -309,21 +309,21 @@ class UserView(MethodView):
 
         return response
 
-    def delete(self, user_id):
+    def delete(self, id):
         """
         Handles a DELETE request given a certain user_id
-        :param user_id: the id of the user to delete
+        :param id: the id of the user to delete
         :return: a response containing the JSON representation of the
             old user
         """
 
-        if user_id is None:
+        if id is None:
             raise RequestError(422, 'user name required')
         else:
-            user = query_by_id('user', user_id)
+            user = query_by_id('user', id)
 
             if user is not None:
-                delete_item('user', user_id)
+                delete_item('user', id)
             else:
                 raise RequestError(404, 'user not found')
         return jsonify(user)
@@ -424,21 +424,21 @@ class ChatView(MethodView):
             # response = jsonify(insert_message(request.form['text'], user_id))
         return response
 
-    def delete(self, chat_id):
+    def delete(self, id):
         """
         Handles a DELETE request given a certain chat_id
-        :param chat_id: the id of the chat to be deleted
+        :param id: the id of the chat to be deleted
         :return: a response containing the JSON representation of the
             old message
         """
 
-        if chat_id is None:
+        if id is None:
             raise RequestError(422, 'chat id required')
         else:
-            chat = query_by_id('chat', chat_id)
+            chat = query_by_id('chat', id)
 
             if chat is not None:
-                delete_item('chat', chat_id)
+                delete_item('chat', id)
             else:
                 raise RequestError(404, 'chat not found')
         return jsonify(chat)

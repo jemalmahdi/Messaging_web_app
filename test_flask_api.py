@@ -718,6 +718,86 @@ def patch(test_client, data):
 # ----------END PATCH TESTS----------
 
 
+# ----------BEGIN DELETE TESTS----------
+def test_delete_user(test_client):
+    api_path = '/api/user/'
+    id = 1
+    id_out_of_bounds = 100
+    data = (api_path,
+            id,
+            id_out_of_bounds)
+    delete(test_client, data)
+
+
+def test_delete_chat(test_client):
+    api_path = '/api/chat/'
+    id = 1
+    id_out_of_bounds = 100
+    data = (api_path,
+            id,
+            id_out_of_bounds)
+    delete(test_client, data)
+
+
+def test_delete_message(test_client):
+    api_path = '/api/message/'
+    id = 1
+    id_out_of_bounds = 100
+    data = (api_path,
+            id,
+            id_out_of_bounds)
+    delete(test_client, data)
+
+
+def test_delete_chatrel(test_client):
+    api_path = '/api/chatrel/'
+    id = 1
+    id_out_of_bounds = 100
+    data = (api_path,
+            id,
+            id_out_of_bounds)
+    delete(test_client, data)
+
+
+def delete(test_client, data):
+    """
+    Tests the DELETE functionality of the API
+
+    Checks:
+    1) Attempts to delete an object, checks for HTTP status code 200
+    2) Checks that the return is an empty JSON object
+    3) Attempts to retrieve teh deleted object, checks for HTTP status code 404
+    4) Attempts to delete an nonexistent object, checks for HTTP status
+    code 404
+
+    :param test_client: flask test_client
+    :param data: A tuple of values to test. (api_path, id, id_out_of_bounds)
+    :return:
+    """
+    api_path = data[0]
+    id = data[1]
+    id_out_of_bounds = data[2]
+
+    # Attempts to delete the specified object
+    response = test_client.delete(api_path+str(id))
+    assert response.status_code == 200
+
+    # Checks that the return in an empty JSON object
+    response_json = json.loads(response.data)
+    assert check_values({}, response_json)
+
+    # Attempts to retrieve the deleted item
+    response = test_client.get(api_path+str(id))
+    assert response.status_code == 404
+
+    # Attempts to delete an object that doesn't exist
+    response = test_client.delete(api_path+str(id_out_of_bounds))
+    assert response.status_code == 404
+
+
+
+
+
 # ----------BEGIN DATABASE TESTS----------
 # def test_database(test_client):
 #

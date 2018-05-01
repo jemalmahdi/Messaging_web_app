@@ -9,14 +9,14 @@ THINGS TO TEST -*- mode: org -*-
 - time TEXT
 - user_id INTEGER FOREIGN KEY
 - chat_id INTEGER FOREIGN KEY
-*** Tests [1/5]
+*** Tests [2/5]
 - [X] POST Message
   - provide message
   - provide user_id
 - [-] GET Message
   - [X] GET one
   - [ ] GET all
-- [ ] PUT Message
+- [X] PUT Message
   - provide message
   - provide user_id
 - [ ] PATCH Message
@@ -30,13 +30,13 @@ THINGS TO TEST -*- mode: org -*-
 - email TEXT UNIQUE
 - username TEXT UNIQUE
 - password TEXT
-*** Tests [1/5]
+*** Tests [2/5]
 - [X] POST User
   - provide user_name
 - [-] GET User
   - [X] GET one
   - [ ] GET all
-- [ ] PUT User
+- [X] PUT User
   - provide user_name
 - [ ] PATCH User
   - provide user_name
@@ -46,7 +46,7 @@ THINGS TO TEST -*- mode: org -*-
 - id INTEGER PRIMARY KEY
 - title TEXT
 - time TEXT
-*** Tests [1/5]
+*** Tests [2/5]
 - [X] POST Chat
   - provide user_id
   - provide text
@@ -54,19 +54,19 @@ THINGS TO TEST -*- mode: org -*-
   - [X] GET one
   - [ ] GET all
 - [ ] PATCH Chat
-- [ ] PUT Chat
+- [X] PUT Chat
 - [ ] DELETE chat
 ** CHATREL
 *** Structure
 - id INTEGER PRIMARY KEY
 - user_id INTEGER FOREIGN KEY
 - chat_id INTEGER FOREIGN KEY
-*** TESTS [1/5]
+*** TESTS [3/5]
 - [X] POST
-- [ ] GET
-- [ ] PUT
+- [X] GET
+- [X] PUT
 - [ ] PATCH
 - [ ] DELETE
 
 * Notes
-- Figure out why the GET isn't working
+- Chat needs PATCH
