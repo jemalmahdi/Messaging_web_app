@@ -100,7 +100,9 @@ class ChatRelView(MethodView):
 
                 if chat is not None:
                     # Need new function
-                    update_user(id, request.form['user_id'])
+                    update_user(id,
+                                request.form['user_id'],
+                                )
                 else:
                     raise RequestError(404, 'chat not found')
                 chat = query_by_id('chat_rel', id)
@@ -242,17 +244,16 @@ class MessageView(MethodView):
             if messages is None:
                 raise RequestError(404, 'message not found')
             else:
-
-                new_text = messages['text']
-                if 'text' in request.form:
-                    new_text = request.form['text']
+                new_text = messages['message']
+                if 'message' in request.form:
+                    new_text = request.form['message']
 
                 new_user = messages['user_id']
                 if 'user' in request.form:
                     new_user = request.form['user']
 
                 update_message(id, new_text, new_user)
-                messages = query_by_id('messages', id)
+                messages = query_by_id('message', id)
                 return jsonify(messages)
 
 
@@ -351,13 +352,17 @@ class UserView(MethodView):
                 user = query_by_id('user', id)
 
                 if user is not None:
-                    update_user(id, request.form['name'])
+                    update_user(id,
+                                request.form['name'],
+                                request.form['email'],
+                                request.form['username'],
+                                request.form['password'])
                 else:
                     raise RequestError(404, 'user not found')
                 user = query_by_id('user', id)
                 return jsonify(user)
 
-    def patch(self, user_id):
+    def patch(self, id):
         """
         Handles the PATCH request given a certain user_id
         :param user_id: the id of the user to be patched
@@ -365,21 +370,33 @@ class UserView(MethodView):
             new user
         """
 
-        if user_id is None:
+        if id is None:
             raise RequestError(422, 'User Id is required')
         else:
-            user = query_by_id('user', user_id)
+            user = query_by_id('user', id)
 
             if user is None:
                 raise RequestError(404, 'User not found')
             else:
-
                 new_name = user['name']
                 if 'name' in request.form:
                     new_name = request.form['name']
+                new_email = user['email']
 
-                update_user(user_id, new_name)
-                user = query_by_id('user', user_id)
+                if 'email' in request.form:
+                    new_email = request.form['email']
+                new_username = user['username']
+
+                if 'username' in request.form:
+                    new_username = request.form['username']
+                new_password = user['password']
+
+                if 'password' in request.form['password']:
+                    new_password = request.form['password']
+
+                update_user(id, new_name, new_email,
+                            new_username, new_password)
+                user = query_by_id('user', id)
                 return jsonify(user)
 
 

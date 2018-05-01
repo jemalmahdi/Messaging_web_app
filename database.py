@@ -313,26 +313,32 @@ def update_message(text, user_id, message_id):
     return dict(cur.fetchone())
 
 
-def update_user(user_id, name):
+def update_user(user_id, name, email, username, password):
     """
     Updates a username given a specific user_id
 
     :param user_id: the id of the user to be updated
     :param name: the updated username
+    :param email: the updated email
+    :param username: the updated username
+    :param password: the updated password
     :return: a dictionary representing the new, updated user
     """
 
     conn = get_db()
     cur = conn.cursor()
 
+    password = sha256_crypt.encrypt(str(password))
+
     query = '''
-        UPDATE user SET name = ? WHERE id = ?
+        UPDATE user SET name = ?, email = ?, username = ?, password = ? WHERE 
+        id = ?
     '''
 
     if cur.execute('SELECT * FROM user WHERE id = ?', (user_id,)) is None:
         raise RequestError(404, 'user not found')
     else:
-        cur.execute(query, (name, user_id))
+        cur.execute(query, (name, email, username, password, user_id))
         conn.commit()
 
     cur.execute('SELECT * FROM user WHERE id = ?', (user_id,))

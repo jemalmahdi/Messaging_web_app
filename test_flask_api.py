@@ -103,6 +103,11 @@ def test_post_message(test_client):
 
 
 def test_post_chatrel(test_client):
+    """
+    Tests the posting of chatrel
+
+    :param test_client: flask test client
+    """
     api_path = '/api/chatrel/'
     chatrel_complete = {
         'user_id': 1,
@@ -325,6 +330,11 @@ def get(test_client, data):
 
 # ----------BEGIN PUT TESTS----------
 def test_put_user(test_client):
+    """
+    Tests the PUT of a user
+
+    :param test_client: flask test client
+    """
     api_path = '/api/user/'
     user_complete = {
         'name': 'TestUser',
@@ -352,6 +362,11 @@ def test_put_user(test_client):
 
 
 def test_put_chat(test_client):
+    """
+    Tests the PUT of a chat
+
+    :param test_client: flask test client
+    """
     api_path = '/api/chat/'
     chat_complete = {
         'title': 'TestChat',
@@ -375,6 +390,11 @@ def test_put_chat(test_client):
 
 
 def test_put_message(test_client):
+    """
+    Tests the PUT of a message
+
+    :param test_client: flask test client
+    """
     api_path = '/api/message/'
     chat_complete = {
         'message': 'Hello world!',
@@ -396,29 +416,6 @@ def test_put_message(test_client):
             id,
             id_out_of_bounds,
             chat_complete,
-            expected_values,
-            expected_keys)
-    put(test_client, data)
-
-
-def test_put_chatrel(test_client):
-    api_path = '/api/chatrel/'
-    chatrel_complete = {
-        'user_id': 1,
-        'chat_id': 1
-    }
-    expected_keys = ('id', 'user_id', 'chat_id')
-    expected_values = {
-        'id': 1,
-        'user_id': 1,
-        'chat_id': 1
-    }
-    id = 1
-    id_out_of_bounds = 100
-    data = (api_path,
-            id,
-            id_out_of_bounds,
-            chatrel_complete,
             expected_values,
             expected_keys)
     put(test_client, data)
@@ -483,20 +480,33 @@ def put(test_client, data):
 
 # ----------BEGIN PATCH TESTS----------
 def test_patch_user(test_client):
+    """
+    Tests PATCH of a user
+
+    :param test_client: flask test client
+    """
     api_path = '/api/user/'
     id = 1
     id_out_of_bounds = 100
-    complete_submissions = (
-        {
-            'name': 'changedName'
-        },
-        {
-            'email': 'updatedEmail@email.email'
-        },
-        {
-            'username': 'updatedusername'
-        }
-    )
+    sub1 = {
+        'name': 'changedName',
+        'email': None,
+        'username': None,
+        'password': None
+    }
+    sub2 = {
+        'name': None,
+        'email': 'updatedEmail@email.email',
+        'username': None,
+        'password': None
+    }
+    sub3 = {
+        'name': None,
+        'email': None,
+        'username': 'updatedusername',
+        'password': None
+    }
+    complete_submissions = (sub1, sub2, sub3)
     expected_values = (
         {
             'id': 1,
@@ -533,6 +543,11 @@ def test_patch_user(test_client):
 
 
 def test_patch_chat(test_client):
+    """
+    Tests PATCH of chat
+
+    :param test_client: flask test client
+    """
     api_path = '/api/chat/'
     id = 1
     id_out_of_bounds = 100
@@ -569,6 +584,11 @@ def test_patch_chat(test_client):
 
 
 def test_patch_message(test_client):
+    """
+    Tests PATCH of a message
+
+    :param test_client: flask test client
+    """
     api_path = '/api/message/'
     id = 1
     id_out_of_bounds = 100
@@ -597,42 +617,6 @@ def test_patch_message(test_client):
         }
     )
     expected_keys = ('id', 'message', 'time', 'user_id', 'chat_id')
-    broken_submission = {'joe': 'joe'}
-    data = (api_path,
-            id,
-            id_out_of_bounds,
-            complete_submissions,
-            expected_values,
-            expected_keys,
-            broken_submission)
-    patch(test_client, data)
-
-
-def test_patch_chatrel(test_client):
-    api_path = '/api/message/'
-    id = 1
-    id_out_of_bounds = 100
-    complete_submissions = (
-        {
-            'user_id': 0
-        },
-        {
-            'chat_id': 0
-        }
-    )
-    expected_values = (
-        {
-            'id': 1,
-            'user_id': 0,
-            'chat_id': 1
-        },
-        {
-            'id': 1,
-            'user_id': 0,
-            'chat_id': 0
-        }
-    )
-    expected_keys = ('id', 'user_id', 'chat_id')
     broken_submission = {'joe': 'joe'}
     data = (api_path,
             id,
@@ -678,7 +662,7 @@ def patch(test_client, data):
 
     # loops through the various PATCH cases and checks each for success
     for submission, expected in zip(complete_submissions, expected_values):
-
+        print (submission)
         # executes a PATCH request and checks the status code for success
         response = test_client.patch(api_path+str(id), data=submission)
         assert response.status_code == 200
@@ -692,7 +676,7 @@ def patch(test_client, data):
         # password in it. This is done so the check_values assertion below
         # works.
         if 'password' in expected and expected['password'] is None:
-            assert sha256_crypt.verify(submission['password'],
+            assert sha256_crypt.verify('sup3rs3cur3passw0rd',
                                        response_json['password'])
             expected['password'] = response_json['password']
 
@@ -720,6 +704,11 @@ def patch(test_client, data):
 
 # ----------BEGIN DELETE TESTS----------
 def test_delete_user(test_client):
+    """
+    Tests DELETE of a user
+
+    :param test_client:flask test client
+    """
     api_path = '/api/user/'
     id = 1
     id_out_of_bounds = 100
@@ -730,6 +719,11 @@ def test_delete_user(test_client):
 
 
 def test_delete_chat(test_client):
+    """
+    Tests DELETE of a chat
+
+    :param test_client: flask test client
+    """
     api_path = '/api/chat/'
     id = 1
     id_out_of_bounds = 100
@@ -740,6 +734,11 @@ def test_delete_chat(test_client):
 
 
 def test_delete_message(test_client):
+    """
+    Tests DELETE of a message
+
+    :param test_client: flask test client
+    """
     api_path = '/api/message/'
     id = 1
     id_out_of_bounds = 100
@@ -750,6 +749,11 @@ def test_delete_message(test_client):
 
 
 def test_delete_chatrel(test_client):
+    """
+    Tests DELETE of a chatrel
+
+    :param test_client: flask test client 
+    """
     api_path = '/api/chatrel/'
     id = 1
     id_out_of_bounds = 100
