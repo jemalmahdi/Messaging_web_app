@@ -305,6 +305,7 @@ def update_message(id, text, time, user_id, chat_id):
     '''
 
     if cur.execute('SELECT * FROM message WHERE id = ?', (id,)) is None:
+            is None:
         raise RequestError(404, 'message not found')
     else:
         cur.execute(query, (text, time, user_id, chat_id, id))
