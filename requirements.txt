@@ -1,0 +1,5 @@
+pip install flask
+pip install WTForms
+pip install tabulate
+pip install flask_login
+pip install passlib
