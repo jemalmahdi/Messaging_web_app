@@ -302,8 +302,11 @@ def update_message(text, user_id, message_id):
         UPDATE message SET message = ?, user_id = ? WHERE id = ?
     '''
 
-    cur.execute(query, (text, user_id, message_id))
-    conn.commit()
+    if cur.execute('SELECT * FROM message WHERE id = ?', (message_id,)) is None:
+        raise RequestError(404, 'message not found')
+    else:
+        cur.execute(query, (text, user_id, message_id))
+        conn.commit()
 
     cur.execute('SELECT * FROM message WHERE id = ?', (message_id,))
 
@@ -326,8 +329,11 @@ def update_user(user_id, name):
         UPDATE user SET name = ? WHERE id = ?
     '''
 
-    cur.execute(query, (name, user_id))
-    conn.commit()
+    if cur.execute('SELECT * FROM user WHERE id = ?', (user_id,)) is None:
+        raise RequestError(404, 'user not found')
+    else:
+        cur.execute(query, (name, user_id))
+        conn.commit()
 
     cur.execute('SELECT * FROM user WHERE id = ?', (user_id,))
 
@@ -350,8 +356,11 @@ def update_chat(chat_id, title):
         UPDATE chat SET title = ? WHERE id = ?
     '''
 
-    cur.execute(query, (title, chat_id))
-    conn.commit()
+    if cur.execute('SELECT * FROM chat WHERE id = ?', (chat_id,)) is None:
+        raise RequestError(404, 'chat not found')
+    else:
+        cur.execute(query, (title, chat_id))
+        conn.commit()
 
     cur.execute('SELECT * FROM chat WHERE id = ?', (chat_id,))
 
