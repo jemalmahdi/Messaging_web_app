@@ -7,7 +7,7 @@ AVI VAJPEYI, JEMAL JEMAL, ISAAC WEISS, MORGAN THOMPSON
 A file containing functions for querying the WooMessages database.
 """
 
-from database import *
+from database_class import *
 from exception_classes import *
 from collections import OrderedDict
 
