@@ -24,14 +24,17 @@ To initalise db with CSV data:
     
     e.g: flask initdb_with_csv WooMessages_CSV.csv
   
-To test db:
+To run command line arguments:
+    
+    python3 query_WooMessage.py show api/message
+    python3 query_WooMessage.py show api/chat
+    python3 query_WooMessage.py show api/user
 
-    sqlite3 WooMessages.sqlite < test_db.sql
-  
 To run tests:
 
     python3 -m pytest -v test_flask_api.py
    
-To run command line arguments:
-    
-    python3
+To test db with sqlite:
+
+    sqlite3 WooMessages.sqlite < test_db.sql
+  
