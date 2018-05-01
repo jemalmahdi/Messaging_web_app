@@ -323,7 +323,7 @@ def get(test_client, data):
 # ----------END GET TESTS----------
 
 
-# ----------BEGIN GET TESTS----------
+# ----------BEGIN PUT TESTS----------
 def test_put_user(test_client):
     api_path = '/api/user/'
     user_complete = {
@@ -428,6 +428,14 @@ def put(test_client, data):
     """
     Tests the PUT API functionality
 
+    Checks:
+    1) attempts to send a put request and checks for a 200 HTTP status code
+    2) checks that the returned data matches the expected data
+    3) Attempts to get the modified data, checks for a 200 HTTP status code
+    4) Checks that the data from the GET request is what's expected
+    5) Attempts to modify a nonexistent data object and checks for a 404 HTTP
+       status code
+
     :param test_client: flask test client
     :param data: a tuple of the values to test. (api_path, id,
     id_out_of_bounds, user_complete, expected_values, expected_keys)
@@ -455,7 +463,7 @@ def put(test_client, data):
                                    response_json['password'])
         expected_values['password'] = response_json['password']
 
-    # # checks that the data in the response is as expected
+    # checks that the data in the response is as expected
     assert check_values(expected_values, response_json)
 
     # executes a GET request
@@ -470,3 +478,240 @@ def put(test_client, data):
     response = test_client.put(api_path+str(id_out_of_bounds),
                                data=user_complete)
     assert response.status_code == 404
+# ----------END PUT TESTS----------
+
+
+# ----------BEGIN PATCH TESTS----------
+def test_patch_user(test_client):
+    api_path = '/api/user/'
+    id = 1
+    id_out_of_bounds = 100
+    complete_submissions = (
+        {
+            'name': 'changedName'
+        },
+        {
+            'email': 'updatedEmail@email.email'
+        },
+        {
+            'username': 'updatedusername'
+        }
+    )
+    expected_values = (
+        {
+            'id': 1,
+            'name': 'changedName',
+            'email': 'test@test.test',
+            'username': 'user',
+            'password': None
+        },
+        {
+            'id': 1,
+            'name': 'changedName',
+            'email': 'updatedEmail@email.email',
+            'username': 'user',
+            'password': None
+        },
+        {
+            'id': 1,
+            'name': 'changedName',
+            'email': 'updatedEmail@email.email',
+            'username': 'updatedusername',
+            'password': None
+        }
+    )
+    expected_keys = ('id', 'name', 'email', 'username', 'password')
+    broken_submission = {'joe': 'joe'}
+    data = (api_path,
+            id,
+            id_out_of_bounds,
+            complete_submissions,
+            expected_values,
+            expected_keys,
+            broken_submission)
+    patch(test_client, data)
+
+
+def test_patch_chat(test_client):
+    api_path = '/api/chat/'
+    id = 1
+    id_out_of_bounds = 100
+    complete_submissions = (
+        {
+            'title': 'changed'
+        },
+        {
+            'time': '14:00'
+        }
+    )
+    expected_values = (
+        {
+            'id': 1,
+            'title': 'changed',
+            'time': '12:00'
+        },
+        {
+            'id': 1,
+            'title': 'changed',
+            'time': '14:00'
+        }
+    )
+    expected_keys = ('id', 'title', 'time')
+    broken_submission = {'joe': 'joe'}
+    data = (api_path,
+            id,
+            id_out_of_bounds,
+            complete_submissions,
+            expected_values,
+            expected_keys,
+            broken_submission)
+    patch(test_client, data)
+
+
+def test_patch_message(test_client):
+    api_path = '/api/message/'
+    id = 1
+    id_out_of_bounds = 100
+    complete_submissions = (
+        {
+            'message': 'updatedMessage'
+        },
+        {
+            'time': '13:00'
+        }
+    )
+    expected_values = (
+        {
+            'id': 1,
+            'message': 'updatedMessage',
+            'time': '14:00',
+            'user_id': 1,
+            'chat_id': 1
+        },
+        {
+            'id': 1,
+            'message': 'updatedMessage',
+            'time': '13:00',
+            'user_id': 1,
+            'chat_id': 1
+        }
+    )
+    expected_keys = ('id', 'message', 'time', 'user_id', 'chat_id')
+    broken_submission = {'joe': 'joe'}
+    data = (api_path,
+            id,
+            id_out_of_bounds,
+            complete_submissions,
+            expected_values,
+            expected_keys,
+            broken_submission)
+    patch(test_client, data)
+
+
+def test_patch_chatrel(test_client):
+    api_path = '/api/message/'
+    id = 1
+    id_out_of_bounds = 100
+    complete_submissions = (
+        {
+            'user_id': 0
+        },
+        {
+            'chat_id': 0
+        }
+    )
+    expected_values = (
+        {
+            'id': 1,
+            'user_id': 0,
+            'chat_id': 1
+        },
+        {
+            'id': 1,
+            'user_id': 0,
+            'chat_id': 0
+        }
+    )
+    expected_keys = ('id', 'user_id', 'chat_id')
+    broken_submission = {'joe': 'joe'}
+    data = (api_path,
+            id,
+            id_out_of_bounds,
+            complete_submissions,
+            expected_values,
+            expected_keys,
+            broken_submission)
+    patch(test_client, data)
+
+
+def patch(test_client, data):
+    """
+    Tests the PATCH API functionality
+
+    Checks:
+    1 - 5 are done in a loop checking multiple configurations
+    -----------------------------------------------------------------
+    1) attempts to patch the data checks for a 200 HTTP status code
+    2) checks that the returned keys are as expected
+    3) checks that the returned data is as expected
+    4) attempts to GET the object
+    5) checks that the returned data is as expected
+    -----------------------------------------------------------------
+    6) attempts to submit a request for an object that doesn't exist, checks
+       for 404 HTTP status
+    7) attempts to submit invalid data, checks for a 422 HTTP status
+
+    :param test_client: flask test client
+    :param data: a tuple with the data to test (api_path, id,
+    id_out_of_bounds, complete_submission, expected_values, expected_keys,
+    broken_submission)
+    :return:
+    """
+
+    api_path = data[0]
+    id = data[1]
+    id_out_of_bounds = data[2]
+    complete_submissions = data[3]
+    expected_values = data[4]
+    expected_keys = data[5]
+    broken_submission = data[6]
+
+    # loops through the various PATCH cases and checks each for success
+    for submission, expected in zip(complete_submissions, expected_values):
+
+        # executes a PATCH request and checks the status code for success
+        response = test_client.patch(api_path+str(id), data=submission)
+        assert response.status_code == 200
+
+        # checks that the keys in the response are as expected
+        response_json = json.loads(response.data)
+        assert check_keys(expected_keys, response_json)
+
+        # A special case for testing the posing of users. It checks that the
+        # passwords match and then updates the expected_values to have the
+        # password in it. This is done so the check_values assertion below
+        # works.
+        if 'password' in expected and expected['password'] is None:
+            assert sha256_crypt.verify(submission['password'],
+                                       response_json['password'])
+            expected['password'] = response_json['password']
+
+        # checks that the data in the response is as expected
+        assert check_values(expected, response_json)
+
+        # executes a GET request
+        response = test_client.get(api_path+str(id))
+        assert response.status_code == 200
+
+        # checks if the GET request dat was as expected
+        response_json = json.loads(response.data)
+        assert check_values(expected, response_json)
+
+    # attempts to submit a PATCH request for an object that doesn't exist
+    response = test_client.patch(api_path+str(id_out_of_bounds),
+                                 data=complete_submissions[0])
+    assert response.status_code == 404
+
+    # attempts to submit a PATCH request with invalid data
+    response = test_client.patch(api_path+str(id), data=broken_submission)
+    assert response.status_code == 422
