@@ -92,7 +92,9 @@ class ChatRelView(MethodView):
             raise RequestError(422, 'chatrel_id is required')
         else:
             if 'user_id' not in request.form:
-                raise RequestError(422, 'User_id is required')
+                raise RequestError(422, 'user_id is required')
+            if 'chat_id' not in request.form:
+                raise RequestError(422, 'chat_id is required')
             else:
                 chat = query_by_id('chat_rel', id)
 
@@ -104,28 +106,28 @@ class ChatRelView(MethodView):
                 chat = query_by_id('chat_rel', id)
                 return jsonify(chat)
 
-    def patch(self, chatrel_id):
+    def patch(self, id):
         """
         Handles the PATCH request given a certain login_id
-        :param login_id: the id of the login to be patched
+        :param id: the id of the login to be patched
         :return:a response containing the JSON representation of the
             new login
         """
 
-        if chatrel_id is None:
+        if id is None:
             raise RequestError(422, 'chatrel_id is required')
         else:
             if 'user_id' not in request.form:
                 raise RequestError(422, 'User_id is required')
             else:
-                chat = query_by_id('chat_rel', chatrel_id)
+                chat = query_by_id('chat_rel', id)
 
                 if chat is not None:
                     # Need new function
-                    update_user(chatrel_id, request.form['user_id'])
+                    update_user(id, request.form['user_id'])
                 else:
                     raise RequestError(404, 'chat not found')
-                chat = query_by_id('chat_rel', chatrel_id)
+                chat = query_by_id('chat_rel', id)
                 return jsonify(chat)
 
 
@@ -206,16 +208,22 @@ class MessageView(MethodView):
         else:
             if 'message' not in request.form:
                 raise RequestError(422, 'message text is required')
+            if 'time' not in request.form:
+                raise RequestError(422, 'message time is required')
+            if 'user_id' not in request.form:
+                raise RequestError(422, 'message user_id is required')
+            if 'chat_id' not in request.form:
+                raise RequestError(422, 'message chat_id is required')
             else:
                 message = query_by_id('message', id)
 
                 if message is not None:
-                    update_message(request.form['message'],
-                                   request.form['user_id'], id)
+                    message = update_message(request.form['message'],
+                                             request.form['user_id'], id)
                 else:
                     raise RequestError(404, 'message not found')
 
-                message = query_by_id('message', id)
+                # message = query_by_id('message', id)
                 return jsonify(message)
 
     def patch(self, message_id):
@@ -323,7 +331,7 @@ class UserView(MethodView):
     def put(self, id):
         """
         Handles a PUT request given a certain user_id
-        :param user_id: the id of the user to be put
+        :param id: the id of the user to be put
         :return:a response containing the JSON representation of the
             new user
         """
@@ -333,6 +341,12 @@ class UserView(MethodView):
         else:
             if 'name' not in request.form:
                 raise RequestError(422, 'User name is required')
+            if 'email' not in request.form:
+                raise RequestError(422, 'User email is required')
+            if 'username' not in request.form:
+                raise RequestError(422, 'User username is required')
+            if 'password' not in request.form:
+                raise RequestError(422, 'User password required')
             else:
                 user = query_by_id('user', id)
 
@@ -442,6 +456,8 @@ class ChatView(MethodView):
         else:
             if 'title' not in request.form:
                 raise RequestError(422, 'Chat title is required')
+            if 'time' not in request.form:
+                raise RequestError(422, 'Chat time is required')
             else:
                 chat = query_by_id('chat', id)
 

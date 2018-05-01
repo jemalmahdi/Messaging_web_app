@@ -13,8 +13,8 @@ THINGS TO TEST -*- mode: org -*-
 - [X] POST Message
   - provide message
   - provide user_id
-- [ ] GET Message
-  - [ ] GET one
+- [-] GET Message
+  - [X] GET one
   - [ ] GET all
 - [ ] PUT Message
   - provide message
@@ -33,8 +33,8 @@ THINGS TO TEST -*- mode: org -*-
 *** Tests [1/5]
 - [X] POST User
   - provide user_name
-- [ ] GET User
-  - [ ] GET one
+- [-] GET User
+  - [X] GET one
   - [ ] GET all
 - [ ] PUT User
   - provide user_name
@@ -50,8 +50,8 @@ THINGS TO TEST -*- mode: org -*-
 - [X] POST Chat
   - provide user_id
   - provide text
-- [ ] GET Chat
-  - [ ] GET one
+- [-] GET Chat
+  - [X] GET one
   - [ ] GET all
 - [ ] PATCH Chat
 - [ ] PUT Chat
