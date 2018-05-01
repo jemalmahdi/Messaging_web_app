@@ -470,3 +470,53 @@ def put(test_client, data):
     response = test_client.put(api_path+str(id_out_of_bounds),
                                data=user_complete)
     assert response.status_code == 404
+
+
+def test_database(test_client):
+
+    conn = test_client.get_db()
+    assert conn is not None
+
+
+def test_insert(test_client):
+    expected_user = {
+        'id': 1,
+        'name': 'Jemal',
+        'email': 'JJemal20@Wooster.edu',
+        'username': 'JJemal',
+        'password': '$5$rounds=535000$oBWsPrEhsccUSqEH$ut'
+                    '/SZIwokcxcNFHlrX/cEu5AIl'
+    }
+
+    expected_chatrel = {
+        'id': 1,
+        'user_id': 1,
+        'chat_id': 1
+    }
+
+    expected_chat = {
+        'id': 1,
+        'title': 'title',
+        'time': '14:00'
+    }
+
+    expected_message = {
+        'id': 1,
+        'message': 'Test message',
+        'time': '15:00',
+        'user_id': 1,
+        'chat_id': 1
+    }
+
+    real_user = test_client.insert_user('Jemal', 'JJemal20@Wooster.edu',
+                                        'JJemal', 'classclown')
+    assert real_user == expected_user
+
+    real_chatrel = test_client.insert_chat_rel(1, 1)
+    assert real_chatrel == expected_chatrel
+
+    real_chat = test_client.insert_chat('title', '14:00')
+    assert real_chat == expected_chat
+
+    real_message = test_client.insert_message('Test message', '15:00', 1, 1)
+    assert real_message == expected_message
