@@ -285,31 +285,33 @@ def insert_table_info(username, password, name, email,
                              user['id'], chat['id'])
 
 
-def update_message(text, user_id, message_id):
+def update_message(id, text, time, user_id, chat_id):
     """
     Updates the contents of a message. Provides the ability to change the
     user id of where the message is delivered to.
 
     :param text: the contents of a message
+    :param time: the updated time
     :param user_id: ID of the message receiver
-    :param message_id: ID of the message
+    :param chat_id: ID of the message
     :return: dictionary containing updated message
     """
     conn = get_db()
     cur = conn.cursor()
 
     query = '''
-        UPDATE message SET message = ?, user_id = ? WHERE id = ?
+        UPDATE message SET message = ?, time =?, user_id = ?, chat_id = ? WHERE 
+        id = ?
     '''
 
-    if cur.execute('SELECT * FROM message WHERE id = ?', (message_id,))\
+    if cur.execute('SELECT * FROM message WHERE id = ?', (id,)) is None:
             is None:
         raise RequestError(404, 'message not found')
     else:
-        cur.execute(query, (text, user_id, message_id))
+        cur.execute(query, (text, time, user_id, chat_id, id))
         conn.commit()
 
-    cur.execute('SELECT * FROM message WHERE id = ?', (message_id,))
+    cur.execute('SELECT * FROM message WHERE id = ?', (id,))
 
     return dict(cur.fetchone())
 
