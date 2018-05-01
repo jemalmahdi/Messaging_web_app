@@ -415,7 +415,7 @@ import os
 
 # Our Scripts
 from custom_views import *
-from database import *
+from database_class import *
 from exception_classes import *
 from queries import *
 from custom_forms import *

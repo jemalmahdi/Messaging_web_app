@@ -302,7 +302,8 @@ def update_message(text, user_id, message_id):
         UPDATE message SET message = ?, user_id = ? WHERE id = ?
     '''
 
-    if cur.execute('SELECT * FROM message WHERE id = ?', (message_id,)) is None:
+    if cur.execute('SELECT * FROM message WHERE id = ?', (message_id,))\
+            is None:
         raise RequestError(404, 'message not found')
     else:
         cur.execute(query, (text, user_id, message_id))
