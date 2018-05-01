@@ -752,14 +752,6 @@ def add_view_rules(view, view_url):
                      view_func=view,
                      methods=['DELETE'])
 
-    app.add_url_rule(view_url+'<int:id>',
-                     view_func=view,
-                     methods=['PUT'])
-
-    app.add_url_rule(view_url+'<int:id>',
-                     view_func=view,
-                     methods=['PATCH'])
-
 
 def create_views_with_rules():
     """

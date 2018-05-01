@@ -80,59 +80,6 @@ class ChatRelView(MethodView):
                 raise RequestError(404, 'Chat rel not found')
         return jsonify(chat)
 
-    def put(self, id):
-        """
-        Handles a PUT request given a certain login_id
-        :param login_id: the id of the login to be put
-        :return: a response containing the JSON representation of the
-            new login
-        """
-
-        if id is None:
-            raise RequestError(422, 'chatrel_id is required')
-        else:
-            if 'user_id' not in request.form:
-                raise RequestError(422, 'user_id is required')
-            if 'chat_id' not in request.form:
-                raise RequestError(422, 'chat_id is required')
-            else:
-                chat = query_by_id('chat_rel', id)
-
-                if chat is not None:
-                    # Need new function
-                    update_user(id,
-                                request.form['message'],
-                                request.form['user_id'],
-                                )
-                else:
-                    raise RequestError(404, 'chat not found')
-                chat = query_by_id('chat_rel', id)
-                return jsonify(chat)
-
-    def patch(self, id):
-        """
-        Handles the PATCH request given a certain login_id
-        :param id: the id of the login to be patched
-        :return:a response containing the JSON representation of the
-            new login
-        """
-
-        if id is None:
-            raise RequestError(422, 'chatrel_id is required')
-        else:
-            if 'user_id' not in request.form:
-                raise RequestError(422, 'User_id is required')
-            else:
-                chat = query_by_id('chat_rel', id)
-
-                if chat is not None:
-                    # Need new function
-                    update_user(id, request.form['user_id'])
-                else:
-                    raise RequestError(404, 'chat not found')
-                chat = query_by_id('chat_rel', id)
-                return jsonify(chat)
-
 
 class MessageView(MethodView):
     def get(self, id):
@@ -197,76 +144,6 @@ class MessageView(MethodView):
             else:
                 raise RequestError(404, 'message not found')
         return jsonify(messages)
-
-    def put(self, id):
-        """
-        Handles a PUT request given a certain message_id
-        :param id: the id of the message to be put
-        :return:a response containing the JSON representation of the
-            new message
-        """
-
-        if id is None:
-            raise RequestError(422, 'message id is required')
-        else:
-            if 'message' not in request.form:
-                raise RequestError(422, 'message text is required')
-            if 'time' not in request.form:
-                raise RequestError(422, 'message time is required')
-            if 'user_id' not in request.form:
-                raise RequestError(422, 'message user_id is required')
-            if 'chat_id' not in request.form:
-                raise RequestError(422, 'message chat_id is required')
-            else:
-                message = query_by_id('message', id)
-
-                if message is not None:
-                    message = update_message(id,
-                                             request.form['text'],
-                                             request.form['time'],
-                                             request.form['user_id'],
-                                             request.form['chat_id'])
-                else:
-                    raise RequestError(404, 'message not found')
-
-                # message = query_by_id('message', id)
-                return jsonify(message)
-
-    def patch(self, id):
-        """
-        Handles the PATCH request given a certain message_id
-        :param id: the id of the message to be patched
-        :return:a response containing the JSON representation of the
-        old message
-        """
-
-        if id is None:
-            raise RequestError(422, 'message id is required')
-        else:
-            messages = query_by_id('message', id)
-
-            if messages is None:
-                raise RequestError(404, 'message not found')
-            else:
-                new_text = messages['message']
-                if 'message' in request.form:
-                    new_text = request.form['message']
-
-                new_user = messages['user_id']
-                if 'user' in request.form:
-                    new_user = request.form['user']
-
-                new_chat = messages['chat_id']
-                if 'chat_id' in request.form:
-                    new_chat = request.form['chat_id']
-
-                new_time = messages['time']
-                if 'time' in request.form:
-                    new_time = request.form['time']
-
-                update_message(id, new_text, new_time, new_user, new_chat)
-                messages = query_by_id('message', id)
-                return jsonify(messages)
 
 
 class UserView(MethodView):
@@ -341,76 +218,6 @@ class UserView(MethodView):
                 raise RequestError(404, 'user not found')
         return jsonify(user)
 
-    def put(self, id):
-        """
-        Handles a PUT request given a certain user_id
-        :param id: the id of the user to be put
-        :return:a response containing the JSON representation of the
-            new user
-        """
-
-        if id is None:
-            raise RequestError(422, 'User Id is required')
-        else:
-            if 'name' not in request.form:
-                raise RequestError(422, 'User name is required')
-            if 'email' not in request.form:
-                raise RequestError(422, 'User email is required')
-            if 'username' not in request.form:
-                raise RequestError(422, 'User username is required')
-            if 'password' not in request.form:
-                raise RequestError(422, 'User password required')
-            else:
-                user = query_by_id('user', id)
-
-                if user is not None:
-                    update_user(id,
-                                request.form['name'],
-                                request.form['email'],
-                                request.form['username'],
-                                request.form['password'])
-                else:
-                    raise RequestError(404, 'user not found')
-                user = query_by_id('user', id)
-                return jsonify(user)
-
-    def patch(self, id):
-        """
-        Handles the PATCH request given a certain user_id
-        :param user_id: the id of the user to be patched
-        :return:a response containing the JSON representation of the
-            new user
-        """
-
-        if id is None:
-            raise RequestError(422, 'User Id is required')
-        else:
-            user = query_by_id('user', id)
-
-            if user is None:
-                raise RequestError(404, 'User not found')
-            else:
-                new_name = user['name']
-                if 'name' in request.form:
-                    new_name = request.form['name']
-                new_email = user['email']
-
-                if 'email' in request.form:
-                    new_email = request.form['email']
-                new_username = user['username']
-
-                if 'username' in request.form:
-                    new_username = request.form['username']
-                new_password = user['password']
-
-                if 'password' in request.form['password']:
-                    new_password = request.form['password']
-
-                update_user(id, new_name, new_email,
-                            new_username, new_password)
-                user = query_by_id('user', id)
-                return jsonify(user)
-
 
 class ChatView(MethodView):
     def get(self, id):
@@ -471,28 +278,3 @@ class ChatView(MethodView):
             else:
                 raise RequestError(404, 'chat not found')
         return jsonify(chat)
-
-    def put(self, id):
-        """
-        Handles a PUT request given a certain chat_id
-        :param id: the id of the chat
-        :return:a response containing the JSON representation of the
-            new chat
-        """
-
-        if id is None:
-            raise RequestError(422, 'Chat Id is required')
-        else:
-            if 'title' not in request.form:
-                raise RequestError(422, 'Chat title is required')
-            if 'time' not in request.form:
-                raise RequestError(422, 'Chat time is required')
-            else:
-                chat = query_by_id('chat', id)
-
-                if chat is not None:
-                    update_chat(id, request.form['title'])
-                else:
-                    raise RequestError(404, 'chat not found')
-                user = query_by_id('chat', id)
-                return jsonify(user)
