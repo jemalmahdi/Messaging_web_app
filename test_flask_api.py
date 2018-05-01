@@ -594,7 +594,10 @@ def test_patch_message(test_client):
     id_out_of_bounds = 100
     complete_submissions = (
         {
-            'message': 'updatedMessage'
+            'message': 'updatedMessage',
+            'time': None,
+            'user_id': None,
+            'chat_id': None
         },
         {
             'time': '13:00'
@@ -752,7 +755,7 @@ def test_delete_chatrel(test_client):
     """
     Tests DELETE of a chatrel
 
-    :param test_client: flask test client 
+    :param test_client: flask test client
     """
     api_path = '/api/chatrel/'
     id = 1

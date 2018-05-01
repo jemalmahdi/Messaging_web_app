@@ -101,6 +101,7 @@ class ChatRelView(MethodView):
                 if chat is not None:
                     # Need new function
                     update_user(id,
+                                request.form['message'],
                                 request.form['user_id'],
                                 )
                 else:
@@ -220,8 +221,11 @@ class MessageView(MethodView):
                 message = query_by_id('message', id)
 
                 if message is not None:
-                    message = update_message(request.form['message'],
-                                             request.form['user_id'], id)
+                    message = update_message(id,
+                                             request.form['text'],
+                                             request.form['time'],
+                                             request.form['user_id'],
+                                             request.form['chat_id'])
                 else:
                     raise RequestError(404, 'message not found')
 
@@ -252,7 +256,15 @@ class MessageView(MethodView):
                 if 'user' in request.form:
                     new_user = request.form['user']
 
-                update_message(id, new_text, new_user)
+                new_chat = messages['chat_id']
+                if 'chat_id' in request.form:
+                    new_chat = request.form['chat_id']
+
+                new_time = messages['time']
+                if 'time' in request.form:
+                    new_time = request.form['time']
+
+                update_message(id, new_text, new_time, new_user, new_chat)
                 messages = query_by_id('message', id)
                 return jsonify(messages)
 
