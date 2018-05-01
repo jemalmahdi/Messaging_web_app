@@ -15,7 +15,7 @@ from flask.views import MethodView, request
 from flask import Flask, g, jsonify
 from queries import *
 from exception_classes import *
-from database import *
+from database_class import *
 
 
 class ChatRelView(MethodView):
