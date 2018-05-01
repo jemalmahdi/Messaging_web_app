@@ -1,5 +1,17 @@
 # WooMessages
 
+To initalise db with CSV data:
+
+    export FLASK_APP=app_main.py
+    flask initdb_with_csv <filename>
+    
+    e.g: flask initdb_with_csv WooMessages_CSV.csv
+
+To initalise db:
+   
+    export FLASK_APP=app_main.py
+    flask initdb
+
 To run flask app:
 
     <activate virtual environment>
@@ -11,18 +23,6 @@ To run flask app:
     pip install passlib
     export FLASK_APP=app_main.py
     flask run
-  
-To initalise db:
-   
-    export FLASK_APP=app_main.py
-    flask initdb
-
-To initalise db with CSV data:
-
-    export FLASK_APP=app_main.py
-    flask initdb_with_csv <filename>
-    
-    e.g: flask initdb_with_csv WooMessages_CSV.csv
   
 To run command line arguments:
     
