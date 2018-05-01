@@ -406,7 +406,7 @@ $ curl -X DELETE http://127.0.0.1:5000/api/message/1
 # Imported Scripts
 import click
 from flask import *
-from flask.ext.login import LoginManager, UserMixin, \
+from flask_login import LoginManager, UserMixin, \
                                 login_required, login_user, logout_user
 # a hash algorithm that encrypts password
 from passlib.hash import sha256_crypt
