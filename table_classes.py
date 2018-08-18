@@ -113,7 +113,8 @@ class User:
         """
         return '<username>: <name> whose email is <email>' \
                ' and password is <password>'.format(self._username, self._name,
-                                              self._email, self._password)
+                                                    self._email,
+                                                    self._password)
 
     def get_username(self):
         return self._username
@@ -161,4 +162,3 @@ class ChatRel:
 
     def get_chat_id(self):
         return self._chat
-    

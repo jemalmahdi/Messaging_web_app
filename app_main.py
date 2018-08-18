@@ -406,7 +406,7 @@ $ curl -X DELETE http://127.0.0.1:5000/api/message/1
 # Imported Scripts
 import click
 from flask import *
-from flask.ext.login import LoginManager, UserMixin, \
+from flask_login import LoginManager, UserMixin, \
                                 login_required, login_user, logout_user
 # a hash algorithm that encrypts password
 from passlib.hash import sha256_crypt
@@ -415,7 +415,7 @@ import os
 
 # Our Scripts
 from custom_views import *
-from database import *
+from database_class import *
 from exception_classes import *
 from queries import *
 from custom_forms import *
@@ -751,14 +751,6 @@ def add_view_rules(view, view_url):
     app.add_url_rule(view_url+'<int:id>',
                      view_func=view,
                      methods=['DELETE'])
-
-    app.add_url_rule(view_url+'<int:id>',
-                     view_func=view,
-                     methods=['PUT'])
-
-    app.add_url_rule(view_url+'<int:id>',
-                     view_func=view,
-                     methods=['PATCH'])
 
 
 def create_views_with_rules():
