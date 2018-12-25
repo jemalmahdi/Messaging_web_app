@@ -1,5 +1,7 @@
 # WooMessages
 
+This is an instant messaging web application that uses the Flask web framework and the SQLite database management system
+
 To initalise db with CSV data:
 
     export FLASK_APP=app_main.py
@@ -38,3 +40,11 @@ To test db with sqlite:
 
     sqlite3 WooMessages.sqlite < test_db.sql
   
+Contributors to this group project:
+
+    Github usernames:
+     - jemalmahdi
+     - iweiss20
+     - wajiwaji
+     - avivajpeyi
+    
